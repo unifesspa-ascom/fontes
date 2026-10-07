@@ -90,6 +90,10 @@ footer{color:var(--muted);font-size:12px;padding:0 0 30px}
       <button class="btn" id="btnOA" type="button">Testar base aberta (OpenAlex)</button>
       <button class="btn" id="btnLimpar" type="button">Apagar contatos deste computador</button>
     </div>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <input type="search" id="oaNome" placeholder="Procurar um pesquisador pelo nome no OpenAlex" aria-label="Nome do pesquisador" style="flex:1;min-width:220px">
+      <button class="btn" id="btnOANome" type="button">Procurar</button>
+    </div>
     <div class="aviso" id="admMsg" hidden></div>
   </section>
 
@@ -291,22 +295,32 @@ if(ADMIN){
   // ---- teste do OpenAlex: candidatos só para conferência da ASCOM, nunca vão para o fontes.json ----
   const OA='https://api.openalex.org';
   let CAND=LS.get('fontes_cand',{atualizado:null,itens:[]});
+  const CAMPOS={'Agricultural and Biological Sciences':'Ciências Agrárias e Biológicas','Arts and Humanities':'Artes e Humanidades','Biochemistry, Genetics and Molecular Biology':'Bioquímica, Genética e Biologia Molecular','Business, Management and Accounting':'Administração, Gestão e Contabilidade','Chemical Engineering':'Engenharia Química','Chemistry':'Química','Computer Science':'Ciência da Computação','Decision Sciences':'Ciências da Decisão','Dentistry':'Odontologia','Earth and Planetary Sciences':'Ciências da Terra e Planetárias','Economics, Econometrics and Finance':'Economia, Econometria e Finanças','Energy':'Energia','Engineering':'Engenharias','Environmental Science':'Ciências Ambientais','Health Professions':'Profissões da Saúde','Immunology and Microbiology':'Imunologia e Microbiologia','Materials Science':'Ciência dos Materiais','Mathematics':'Matemática','Medicine':'Medicina','Neuroscience':'Neurociência','Nursing':'Enfermagem','Pharmacology, Toxicology and Pharmaceutics':'Farmacologia, Toxicologia e Farmácia','Physics and Astronomy':'Física e Astronomia','Psychology':'Psicologia','Social Sciences':'Ciências Sociais','Veterinary':'Medicina Veterinária','Multidisciplinary':'Multidisciplinar'};
+  let TRAD={}; fetch('dados/traducoes.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).then(j=>{TRAD=j;renderCand()}).catch(()=>{});
+  const T=t=>CAMPOS[t]||TRAD[t]||t;
+  const SEM=new Set();
+  const Tt=t=>{const r=T(t); if(r===t&&!CAMPOS[t])SEM.add(t); return r};
   const oa=async u=>{const r=await fetch(u);if(!r.ok)throw new Error('OpenAlex respondeu '+r.status);return r.json()};
   function renderCand(){
     const box=$('#cand'); box.hidden=!CAND.itens.length; if(!CAND.itens.length)return;
     const q=norm(filtro.q);
-    const l=CAND.itens.filter(c=>!q||norm([c.nome,c.area,c.topicos.join(' ')].join(' ')).includes(q)).slice(0,300);
+    const l=CAND.itens.filter(c=>!q||norm([c.nome,c.area,T(c.area),c.topicos.map(T).join(' ')].join(' ')).includes(q)).slice(0,300);
     box.innerHTML=`<div class="panel adm"><h2>Candidatos do OpenAlex (não publicados)</h2>
       <p class="sub">${CAND.itens.length} pesquisadores com afiliação à ${esc(CAND.instituicao||'Unifesspa')}, carregados em ${new Date(CAND.atualizado).toLocaleDateString('pt-BR')}. Esta lista aparece só no modo ASCOM e serve para conferir a base e escolher quem convidar. A busca acima também filtra aqui.</p>
-      <div class="row" style="margin-top:12px"><button class="btn" id="btnCandCsv" type="button">Baixar lista de candidatos (CSV)</button></div></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="btnCandCsv" type="button">Baixar lista de candidatos (CSV)</button> <button class="btn" id="btnTermos" type="button">Baixar temas sem tradução</button></div></div>
       <div class="cards">${l.map(c=>`<article class="card"><div class="head"><div class="av" aria-hidden="true">${esc(iniciais(c.nome))}</div>
-        <div><h3>${esc(c.nome)}</h3><div class="uni">${esc(c.area||'Área não identificada')} · ${c.obras} trabalhos</div></div></div>
-        ${c.topicos.length?`<div class="tags">${c.topicos.slice(0,6).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+        <div><h3>${esc(c.nome)}</h3><div class="uni">${esc(c.area?T(c.area):'Área não identificada')} · ${c.obras} trabalhos</div></div></div>
+        ${c.topicos.length?`<div class="tags">${c.topicos.slice(0,6).map(t=>`<span class="tag">${esc(Tt(t))}</span>`).join('')}</div>`:''}
         <div class="foot">${c.orcid?`<a class="btn small" href="${esc(c.orcid)}" target="_blank" rel="noopener">ORCID</a>`:''}
         <a class="btn small" href="${esc(c.id)}" target="_blank" rel="noopener">Ver no OpenAlex</a></div></article>`).join('')}</div>`;
+    $('#btnTermos').onclick=()=>{
+      const todos=new Set(); CAND.itens.forEach(c=>c.topicos.forEach(t=>{if(!TRAD[t])todos.add(t)}));
+      const o={}; [...todos].sort().forEach(t=>o[t]=''); 
+      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:'application/json'}));a.download='temas-para-traduzir.json';document.body.appendChild(a);a.click();a.remove();
+    };
     $('#btnCandCsv').onclick=()=>{
       const cols=['nome','area','trabalhos','temas','orcid','openalex'];
-      const rows=[cols.join(';')].concat(CAND.itens.map(c=>[c.nome,c.area,c.obras,c.topicos.join(', '),c.orcid||'',c.id].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(';')));
+      const rows=[cols.join(';')].concat(CAND.itens.map(c=>[c.nome,T(c.area),c.obras,c.topicos.map(T).join(', '),c.orcid||'',c.id].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(';')));
       const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv'}));a.download='candidatos-openalex.csv';document.body.appendChild(a);a.click();a.remove();
     };
   }
@@ -320,23 +334,42 @@ if(ADMIN){
       const lista=(j.results||[]).filter(i=>i.country_code==='BR');
       const inst=lista.find(i=>norm(i.display_name).includes('sul e sudeste do para'))||lista[0];
       if(!inst)throw new Error('instituição não encontrada no OpenAlex');
-      const id=inst.id.split('/').pop(), itens=[]; let cursor='*';
-      for(let p=0;p<10&&cursor;p++){
-        b.textContent=`Carregando pesquisadores (${itens.length})...`;
-        const r=await oa(`${OA}/authors?filter=last_known_institutions.id:${id},works_count:%3E2&per-page=200&cursor=${encodeURIComponent(cursor)}&select=id,display_name,orcid,works_count,topics`);
-        (r.results||[]).forEach(a=>{
-          const tops=(a.topics||[]).slice(0,8), campos={};
-          tops.forEach(t=>{const f=t.field&&t.field.display_name;if(f)campos[f]=(campos[f]||0)+1});
-          const ar=Object.entries(campos).sort((x,y)=>y[1]-x[1])[0];
-          itens.push({id:a.id,nome:a.display_name,orcid:a.orcid,obras:a.works_count,area:ar?ar[0]:'',topicos:tops.map(t=>t.display_name)});
-        });
-        cursor=r.meta&&r.meta.next_cursor; if(!(r.results||[]).length)break;
+      const id=inst.id.split('/').pop(), mapa=new Map();
+      const SEL='id,display_name,orcid,works_count,topics';
+      const add=a=>{ if(mapa.has(a.id))return; const tops=(a.topics||[]).slice(0,8), campos={};
+        tops.forEach(t=>{const f=t.field&&t.field.display_name;if(f)campos[f]=(campos[f]||0)+1});
+        const ar=Object.entries(campos).sort((x,y)=>y[1]-x[1])[0];
+        mapa.set(a.id,{id:a.id,nome:a.display_name,orcid:a.orcid,obras:a.works_count,area:ar?ar[0]:'',topicos:tops.map(t=>t.display_name)}); };
+      for(const filtro of [`last_known_institutions.id:${id}`,`affiliations.institution.id:${id}`]){
+        let cursor='*';
+        for(let p=0;p<15&&cursor;p++){
+          b.textContent=`Carregando pesquisadores (${mapa.size})...`;
+          const r=await oa(`${OA}/authors?filter=${filtro}&per-page=200&cursor=${encodeURIComponent(cursor)}&select=${SEL}`);
+          (r.results||[]).forEach(add);
+          cursor=r.meta&&r.meta.next_cursor; if(!(r.results||[]).length)break;
+        }
       }
+      const itens=[...mapa.values()].sort((x,y)=>x.nome.localeCompare(y.nome));
       CAND={atualizado:new Date().toISOString(),instituicao:inst.display_name,itens};
       LS.set('fontes_cand',CAND); renderCand();
       msg(`${itens.length} pesquisadores carregados de "${inst.display_name}". Confira os nomes e áreas abaixo: o OpenAlex atribui autores automaticamente e pode errar.`);
     }catch(err){msg('Não foi possível consultar o OpenAlex agora: '+err.message)}
     finally{b.disabled=false;b.textContent='Testar base aberta (OpenAlex)'}
+  };
+  $('#btnOANome').onclick=async()=>{
+    const nome=$('#oaNome').value.trim(); if(nome.length<3){msg('Digite pelo menos 3 letras do nome.');return}
+    const b=$('#btnOANome'); b.disabled=true; b.textContent='Procurando...';
+    try{
+      const r=await oa(`${OA}/authors?search=${encodeURIComponent(nome)}&per-page=15&select=id,display_name,orcid,works_count,topics,last_known_institutions`);
+      const l=r.results||[];
+      const box=$('#cand'); box.hidden=false;
+      box.insertAdjacentHTML('afterbegin',`<div class="panel adm" id="resNome"><h2>Resultado da busca por "${esc(nome)}"</h2>
+        <p class="sub">${l.length?'Confira a instituição: a ocorrência com a Unifesspa indica que a pessoa está na lista; outra instituição indica atribuição diferente no OpenAlex.':'Ninguém encontrado com esse nome. Essa pessoa precisa se cadastrar pelo formulário.'}</p>
+        ${l.map(a=>{const tops=(a.topics||[]).slice(0,4).map(t=>esc(Tt(t.display_name))).join(', ');const ins=(a.last_known_institutions||[]).map(i=>i.display_name).join('; ')||'sem instituição';
+          return `<p style="margin:8px 0"><b>${esc(a.display_name)}</b> · ${esc(ins)} · ${a.works_count} trabalhos<br><span class="sub">${tops||'sem temas'}</span> <a href="${esc(a.id)}" target="_blank" rel="noopener">abrir</a></p>`}).join('')}</div>`);
+      document.getElementById('resNome').scrollIntoView({behavior:'smooth'});
+    }catch(err){msg('Falha na busca: '+err.message)}
+    finally{b.disabled=false;b.textContent='Procurar'}
   };
   $('#btnLimpar').onclick=()=>{if(confirm('Apagar os contatos guardados neste computador?')){LS.del('fontes_contatos');CONTATOS={};render();msg('Contatos apagados.')}};
 }
