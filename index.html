@@ -18,6 +18,7 @@
   --shadow:0 14px 36px -26px rgba(0,0,0,.8);
 }}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.5}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
@@ -86,6 +87,7 @@ footer{color:var(--muted);font-size:12px;padding:0 0 30px}
     <div class="row" style="margin-top:12px">
       <button class="btn primary" id="btnCsv" type="button">Importar respostas do formulário (CSV)</button>
       <button class="btn" id="btnJson" type="button">Baixar fontes.json público</button>
+      <button class="btn" id="btnOA" type="button">Testar base aberta (OpenAlex)</button>
       <button class="btn" id="btnLimpar" type="button">Apagar contatos deste computador</button>
     </div>
     <div class="aviso" id="admMsg" hidden></div>
@@ -104,6 +106,7 @@ footer{color:var(--muted);font-size:12px;padding:0 0 30px}
   </section>
 
   <section id="lista"></section>
+  <section id="cand" hidden></section>
   <footer>As informações são fornecidas pelos próprios docentes, que autorizaram a divulgação. O contato é intermediado pela Assessoria de Comunicação (ASCOM) da Unifesspa. <span id="atual"></span></footer>
 </main>
 
@@ -215,7 +218,8 @@ function abrir(id){
   const sem=!cfg().whatsapp&&!cfg().email;
   $('#dlgAviso').hidden=!sem;
   if(sem)$('#dlgAviso').textContent='Os canais de atendimento da ASCOM ainda não foram configurados nesta página.';
-  $('#j_zap').disabled=!cfg().whatsapp; $('#j_mail').disabled=!cfg().email;
+  $('#j_zap').hidden=!cfg().whatsapp; $('#j_mail').hidden=!cfg().email;
+  $('#j_mail').className=cfg().whatsapp?'btn':'btn primary';
   $('#dlg').showModal();
 }
 function mensagem(){
@@ -283,6 +287,56 @@ if(ADMIN){
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(pub,null,1)],{type:'application/json'}));
     a.download='fontes.json';document.body.appendChild(a);a.click();a.remove();
     msg('Arquivo baixado. Ele não contém e-mail nem telefone. Coloque-o na pasta "dados" do repositório.');
+  };
+  // ---- teste do OpenAlex: candidatos só para conferência da ASCOM, nunca vão para o fontes.json ----
+  const OA='https://api.openalex.org';
+  let CAND=LS.get('fontes_cand',{atualizado:null,itens:[]});
+  const oa=async u=>{const r=await fetch(u);if(!r.ok)throw new Error('OpenAlex respondeu '+r.status);return r.json()};
+  function renderCand(){
+    const box=$('#cand'); box.hidden=!CAND.itens.length; if(!CAND.itens.length)return;
+    const q=norm(filtro.q);
+    const l=CAND.itens.filter(c=>!q||norm([c.nome,c.area,c.topicos.join(' ')].join(' ')).includes(q)).slice(0,300);
+    box.innerHTML=`<div class="panel adm"><h2>Candidatos do OpenAlex (não publicados)</h2>
+      <p class="sub">${CAND.itens.length} pesquisadores com afiliação à ${esc(CAND.instituicao||'Unifesspa')}, carregados em ${new Date(CAND.atualizado).toLocaleDateString('pt-BR')}. Esta lista aparece só no modo ASCOM e serve para conferir a base e escolher quem convidar. A busca acima também filtra aqui.</p>
+      <div class="row" style="margin-top:12px"><button class="btn" id="btnCandCsv" type="button">Baixar lista de candidatos (CSV)</button></div></div>
+      <div class="cards">${l.map(c=>`<article class="card"><div class="head"><div class="av" aria-hidden="true">${esc(iniciais(c.nome))}</div>
+        <div><h3>${esc(c.nome)}</h3><div class="uni">${esc(c.area||'Área não identificada')} · ${c.obras} trabalhos</div></div></div>
+        ${c.topicos.length?`<div class="tags">${c.topicos.slice(0,6).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+        <div class="foot">${c.orcid?`<a class="btn small" href="${esc(c.orcid)}" target="_blank" rel="noopener">ORCID</a>`:''}
+        <a class="btn small" href="${esc(c.id)}" target="_blank" rel="noopener">Ver no OpenAlex</a></div></article>`).join('')}</div>`;
+    $('#btnCandCsv').onclick=()=>{
+      const cols=['nome','area','trabalhos','temas','orcid','openalex'];
+      const rows=[cols.join(';')].concat(CAND.itens.map(c=>[c.nome,c.area,c.obras,c.topicos.join(', '),c.orcid||'',c.id].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(';')));
+      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv'}));a.download='candidatos-openalex.csv';document.body.appendChild(a);a.click();a.remove();
+    };
+  }
+  renderCand();
+  $('#q').addEventListener('input',renderCand);
+  $('#btnOA').onclick=async()=>{
+    const b=$('#btnOA'); b.disabled=true;
+    try{
+      b.textContent='Procurando a instituição...';
+      const j=await oa(`${OA}/institutions?search=${encodeURIComponent('Universidade Federal do Sul e Sudeste do Pará')}&select=id,display_name,country_code`);
+      const lista=(j.results||[]).filter(i=>i.country_code==='BR');
+      const inst=lista.find(i=>norm(i.display_name).includes('sul e sudeste do para'))||lista[0];
+      if(!inst)throw new Error('instituição não encontrada no OpenAlex');
+      const id=inst.id.split('/').pop(), itens=[]; let cursor='*';
+      for(let p=0;p<10&&cursor;p++){
+        b.textContent=`Carregando pesquisadores (${itens.length})...`;
+        const r=await oa(`${OA}/authors?filter=last_known_institutions.id:${id},works_count:%3E2&per-page=200&cursor=${encodeURIComponent(cursor)}&select=id,display_name,orcid,works_count,topics`);
+        (r.results||[]).forEach(a=>{
+          const tops=(a.topics||[]).slice(0,8), campos={};
+          tops.forEach(t=>{const f=t.field&&t.field.display_name;if(f)campos[f]=(campos[f]||0)+1});
+          const ar=Object.entries(campos).sort((x,y)=>y[1]-x[1])[0];
+          itens.push({id:a.id,nome:a.display_name,orcid:a.orcid,obras:a.works_count,area:ar?ar[0]:'',topicos:tops.map(t=>t.display_name)});
+        });
+        cursor=r.meta&&r.meta.next_cursor; if(!(r.results||[]).length)break;
+      }
+      CAND={atualizado:new Date().toISOString(),instituicao:inst.display_name,itens};
+      LS.set('fontes_cand',CAND); renderCand();
+      msg(`${itens.length} pesquisadores carregados de "${inst.display_name}". Confira os nomes e áreas abaixo: o OpenAlex atribui autores automaticamente e pode errar.`);
+    }catch(err){msg('Não foi possível consultar o OpenAlex agora: '+err.message)}
+    finally{b.disabled=false;b.textContent='Testar base aberta (OpenAlex)'}
   };
   $('#btnLimpar').onclick=()=>{if(confirm('Apagar os contatos guardados neste computador?')){LS.del('fontes_contatos');CONTATOS={};render();msg('Contatos apagados.')}};
 }
