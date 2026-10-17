@@ -131,6 +131,23 @@ footer{color:var(--muted);font-size:12px;padding:0 0 30px}
     <button class="btn primary" type="button" id="j_mail">Enviar por e-mail</button>
   </div>
 </form></dialog>
+
+<dialog id="dlgDocente">
+  <form method="dialog">
+    <h2>Verificar vínculo docente</h2>
+    <p class="sub">Digite seu nome completo exatamente como consta no SIGAA para confirmar que você é docente ativo da UNIFESSPA.</p>
+    <div style="margin:12px 0">
+      <input type="text" id="inpNomeDocente" placeholder="Nome completo" autocomplete="off"
+        style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:var(--surface);color:var(--fg)">
+    </div>
+    <div id="dlgDocenteMsg" style="font-size:13px;min-height:20px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" type="button" id="j_docente_cancel">Cancelar</button>
+      <button class="btn primary" type="button" id="j_docente_ok">Verificar</button>
+    </div>
+  </form>
+</dialog>
+
 <input type="file" id="arq" accept=".csv,text/csv" class="sr">
 
 <script>
@@ -151,13 +168,56 @@ function iniciais(n){
   const p=String(n).replace(/\b(dr|dra|prof|profa)\.?\s/gi,'').trim().split(/\s+/).filter(Boolean);
   return ((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();
 }
+let DOCENTES_SIGAA=[];
 function carregar(){
-  return fetch('dados/fontes.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{
+  const p1=fetch('dados/fontes.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{
     if(j&&Array.isArray(j.fontes))DADOS=j;
-  }).catch(()=>{}).then(()=>{render();iniciar()});
+  }).catch(()=>{});
+  const p2=fetch('dados/docentes-sigaa.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{
+    if(j&&Array.isArray(j.docentes))DOCENTES_SIGAA=j.docentes;
+  }).catch(()=>{});
+  return Promise.all([p1,p2]).then(()=>{render();iniciar()});
+}
+function verificarDocente(nome){
+  if(!DOCENTES_SIGAA.length)return null;
+  const n=norm(nome);
+  if(!n)return false;
+  return DOCENTES_SIGAA.find(d=>norm(d.nome)===n)||false;
 }
 function iniciar(){
-  if(cfg().formulario){const a=$('#btnDocente');a.href=cfg().formulario;a.hidden=false}
+  if(cfg().formulario){
+    const btn=$('#btnDocente');
+    btn.hidden=false;
+    btn.href='#';
+    btn.onclick=function(e){
+      e.preventDefault();
+      $('#inpNomeDocente').value='';
+      $('#dlgDocenteMsg').textContent='';
+      $('#dlgDocenteMsg').style.color='';
+      $('#dlgDocente').showModal();
+    };
+    $('#j_docente_ok').onclick=function(){
+      const nome=$('#inpNomeDocente').value.trim();
+      const msg=$('#dlgDocenteMsg');
+      if(!nome){msg.style.color='var(--danger,#c00)';msg.textContent='Por favor, informe seu nome completo.';return;}
+      if(!DOCENTES_SIGAA.length){
+        $('#dlgDocente').close();
+        window.open(cfg().formulario,'_blank','noopener');
+        return;
+      }
+      const encontrado=verificarDocente(nome);
+      if(encontrado){
+        msg.style.color='#1a7a1a';
+        msg.textContent='✓ Vínculo confirmado! Abrindo formulário…';
+        setTimeout(()=>{$('#dlgDocente').close();window.open(cfg().formulario,'_blank','noopener');},900);
+      } else {
+        msg.style.color='var(--danger,#c00)';
+        msg.textContent='Nome não encontrado na lista de docentes ativos do SIGAA. Verifique a grafia e tente novamente.';
+      }
+    };
+    $('#j_docente_cancel').onclick=()=>$('#dlgDocente').close();
+    $('#inpNomeDocente').addEventListener('keydown',e=>{if(e.key==='Enter')$('#j_docente_ok').click()});
+  }
   $('#atual').textContent=DADOS.atualizado?'Atualizado em '+new Date(DADOS.atualizado).toLocaleDateString('pt-BR')+'.':'';
 }
 function opcoes(sel,lista,vazio){
