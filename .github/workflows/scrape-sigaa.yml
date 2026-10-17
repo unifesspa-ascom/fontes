@@ -1,0 +1,35 @@
+name: Atualizar lista de docentes SIGAA
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # 5h UTC = 2h Brasília, todo dia
+  workflow_dispatch:        # permite execução manual pelo GitHub Actions
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Rodar o scraper
+        run: python scripts/scrape_sigaa.py
+
+      - name: Commitar mudanças (se houver)
+        run: |
+          git config user.name "ASCOM Bot"
+          git config user.email "ascom@unifesspa.edu.br"
+          git add dados/docentes-sigaa.json
+          git diff --staged --quiet || git commit -m "bot: atualizar lista de docentes SIGAA [$(date -u +%Y-%m-%d)]"
+          git push
