@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco de Fontes UNIFESSPA — Cadastro de Docente</title>
+  <style>
+    :root {
+      --verde: #1a5c2a;
+      --verde-claro: #2d8a42;
+      --amarelo: #f5c518;
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --texto: #212529;
+      --muted: #6c757d;
+      --borda: #dee2e6;
+      --erro: #dc3545;
+      --sucesso: #198754;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #121212;
+        --card: #1e1e1e;
+        --texto: #e0e0e0;
+        --muted: #9e9e9e;
+        --borda: #333;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--verde);
+      color: #fff;
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+    header img { height: 48px; margin-bottom: 0.5rem; }
+    header h1 { font-size: 1.3rem; font-weight: 700; }
+    header p { font-size: 0.875rem; opacity: 0.85; margin-top: 0.25rem; }
+    main {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; color: var(--verde); margin-bottom: 1rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; }
+    label .req { color: var(--erro); }
+    input[type=text], input[type=email], input[type=tel],
+    input[type=url], input[type=number], select, textarea {
+      width: 100%; padding: 0.6rem 0.75rem;
+      border: 1.5px solid var(--borda);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--card);
+      color: var(--texto);
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--verde-claro);
+      box-shadow: 0 0 0 3px rgba(45,138,66,0.15);
+    }
+    input[readonly] { background: var(--bg); cursor: not-allowed; }
+    textarea { resize: vertical; min-height: 100px; }
+    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    .field-group { margin-bottom: 1.25rem; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 500px) { .row-2 { grid-template-columns: 1fr; } }
+
+    /* SIAPE lookup */
+    .siape-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+    .siape-row input { flex: 1; }
+    .btn-lookup {
+      padding: 0.6rem 1.2rem;
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-lookup:hover { background: var(--verde-claro); }
+
+    /* Confirmação do professor */
+    #confirmacao {
+      display: none;
+      background: #e8f5e9;
+      border: 1.5px solid #a5d6a7;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    #confirmacao strong { color: var(--verde); }
+
+    /* Disponibilidade */
+    .radio-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border: 1.5px solid var(--borda);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .radio-group input[type=radio] { accent-color: var(--verde); }
+    .radio-group label:has(input:checked) {
+      border-color: var(--verde);
+      background: #e8f5e9;
+      font-weight: 600;
+    }
+
+    /* Seção condicional */
+    #secao-cadastro { display: none; }
+
+    /* Formações */
+    .formacao-item {
+      border: 1.5px solid var(--borda);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+    .formacao-item .btn-remover {
+      position: absolute;
+      top: 0.6rem; right: 0.75rem;
+      background: none; border: none;
+      color: var(--erro); font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: 1.5px dashed var(--verde);
+      border-radius: 8px;
+      background: none;
+      color: var(--verde);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    .btn-add:hover { background: #e8f5e9; }
+
+    /* Tags temas */
+    .tags-input { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+      border: 1.5px solid var(--borda); border-radius: 8px; padding: 0.4rem 0.6rem;
+      cursor: text; min-height: 2.5rem; }
+    .tags-input:focus-within { border-color: var(--verde-claro); box-shadow: 0 0 0 3px rgba(45,138,66,0.15); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      background: #e8f5e9; color: var(--verde);
+      border-radius: 4px; padding: 0.15rem 0.5rem;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    .tag button { background: none; border: none; color: var(--verde); cursor: pointer; font-size: 0.9rem; line-height: 1; }
+    .tag-field {
+      border: none; outline: none; background: transparent;
+      font-size: 0.9rem; color: var(--texto); min-width: 120px; flex: 1;
+    }
+
+    /* Checkbox formatos */
+    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 400px) { .checkbox-grid { grid-template-columns: 1fr; } }
+    .check-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.6rem;
+      border: 1.5px solid var(--borda); border-radius: 8px;
+      cursor: pointer; font-size: 0.875rem; font-weight: 400;
+      transition: all 0.2s;
+    }
+    .check-item:has(input:checked) { border-color: var(--verde); background: #e8f5e9; font-weight: 600; }
+    .check-item input { accent-color: var(--verde); }
+
+    /* Progresso */
+    .progress-bar { height: 4px; background: var(--borda); border-radius: 2px; margin-bottom: 1.5rem; }
+    .progress-bar .fill { height: 100%; background: var(--verde); border-radius: 2px; transition: width 0.4s; }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%; padding: 0.85rem;
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--verde-claro); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Mensagem de sucesso */
+    #msg-sucesso, #msg-recusa {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    #msg-sucesso .icon, #msg-recusa .icon { font-size: 3rem; margin-bottom: 1rem; }
+    #msg-sucesso h2 { color: var(--sucesso); }
+    #msg-recusa h2 { color: var(--muted); }
+
+    /* Erro inline */
+    .campo-erro { border-color: var(--erro) !important; }
+    .msg-erro { color: var(--erro); font-size: 0.78rem; margin-top: 0.25rem; display: none; }
+
+    #loading { display: none; text-align: center; padding: 1rem; color: var(--muted); }
+    .spinner { display: inline-block; width: 20px; height: 20px;
+      border: 3px solid var(--borda); border-top-color: var(--verde);
+      border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Banco de Fontes UNIFESSPA</h1>
+  <p>Cadastro de docente para atendimento à imprensa</p>
+</header>
+
+<main>
+  <!-- Formulário principal -->
+  <div id="form-container">
+
+    <!-- PASSO 1: SIAPE -->
+    <div class="card" id="card-siape">
+      <h2>1. Identificação pelo SIAPE</h2>
+      <div class="field-group">
+        <label for="siape">Número SIAPE <span class="req">*</span></label>
+        <div class="siape-row">
+          <input type="number" id="siape" placeholder="Ex: 1234567" min="1000000" max="9999999">
+          <button class="btn-lookup" onclick="buscarSiape()">Buscar</button>
+        </div>
+        <p class="hint">Digite seu número SIAPE (7 dígitos) para preencher automaticamente seus dados.</p>
+        <p class="msg-erro" id="erro-siape">SIAPE não encontrado na base de dados do SIGAA. Verifique o número informado.</p>
+      </div>
+      <div id="confirmacao">
+        É você? <strong id="nome-confirmado"></strong> — <em id="unidade-confirmada"></em>
+      </div>
+    </div>
+
+    <!-- PASSO 2: Disponibilidade -->
+    <div class="card" id="card-disponivel" style="display:none">
+      <h2>2. Disponibilidade para entrevistas</h2>
+      <div class="field-group">
+        <label>Você está disponível para atender jornalistas e dar entrevistas? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="disponivel" value="sim" onchange="definirDisponibilidade(this)"> Sim, estou disponível</label>
+          <label><input type="radio" name="disponivel" value="nao" onchange="definirDisponibilidade(this)"> Não, por enquanto não</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSO 3: Dados do cadastro -->
+    <div id="secao-cadastro">
+
+      <div class="card">
+        <h2>3. Formação acadêmica</h2>
+        <p class="hint" style="margin-bottom:1rem">Adicione sua graduação e, se desejar, sua(s) pós-graduação(ões).</p>
+        <div id="lista-formacoes"></div>
+        <button class="btn-add" onclick="adicionarFormacao()">+ Adicionar formação</button>
+      </div>
+
+      <div class="card">
+        <h2>4. Atuação e especialidade</h2>
+
+        <div class="field-group">
+          <label for="campus">Campus <span class="req">*</span></label>
+          <select id="campus">
+            <option value="">Selecione...</option>
+            <option>Marabá (Campus Sede)</option>
+            <option>Xinguara</option>
+            <option>Rondon do Pará</option>
+            <option>São Félix do Xingu</option>
+            <option>Altamira</option>
+            <option>Santana do Araguaia</option>
+            <option>São Geraldo do Araguaia</option>
+            <option>Conceição do Araguaia</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="resumo">Mini-bio / Apresentação <span class="req">*</span></label>
+          <textarea id="resumo" rows="4" placeholder="Escreva um breve resumo da sua trajetória e área de atuação (até 500 caracteres)." maxlength="500"></textarea>
+          <p class="hint"><span id="conta-resumo">0</span>/500 caracteres</p>
+        </div>
+
+        <div class="field-group">
+          <label>Temas de especialidade <span class="req">*</span></label>
+          <p class="hint" style="margin-bottom:0.5rem">Digite um tema e pressione Enter ou vírgula para adicionar.</p>
+          <div class="tags-input" id="tags-container" onclick="document.getElementById('tag-input').focus()">
+            <input class="tag-field" id="tag-input" placeholder="Ex: Amazônia, educação..." onkeydown="tagKeydown(event)" onblur="tagBlur()">
+          </div>
+          <input type="hidden" id="temas-value">
+        </div>
+
+        <div class="field-group">
+          <label>Formatos de atendimento</label>
+          <div class="checkbox-grid">
+            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista presencial"> Entrevista presencial</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista por vídeo"> Entrevista por vídeo</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista por telefone"> Entrevista por telefone</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Respostas por escrito"> Respostas por escrito</label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="lattes">Link do Lattes</label>
+          <input type="url" id="lattes" placeholder="http://lattes.cnpq.br/...">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>5. Contato (não público)</h2>
+        <p class="hint" style="margin-bottom:1rem">Esses dados ficam visíveis apenas para a equipe da ASCOM — não aparecem no site.</p>
+        <div class="row-2">
+          <div class="field-group">
+            <label for="email">E-mail institucional <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="nome@unifesspa.edu.br">
+          </div>
+          <div class="field-group">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" placeholder="(94) 9 9999-9999">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>6. Observações (opcional)</h2>
+        <div class="field-group">
+          <label for="obs">Observações ou dados incorretos</label>
+          <textarea id="obs" rows="3" placeholder="Identificou algum dado errado no sistema? Deixe uma observação aqui."></textarea>
+        </div>
+      </div>
+
+      <div id="loading"><span class="spinner"></span> Enviando...</div>
+
+      <button class="btn-submit" id="btn-enviar" onclick="enviar()">Enviar cadastro</button>
+    </div><!-- /secao-cadastro -->
+
+  </div><!-- /form-container -->
+
+  <!-- Mensagem recusa -->
+  <div id="msg-recusa" class="card">
+    <div class="icon">👍</div>
+    <h2>Tudo bem!</h2>
+    <p style="margin-top:0.75rem;color:var(--muted)">Sua resposta foi registrada. Quando quiser se cadastrar, basta acessar este formulário novamente.</p>
+  </div>
+
+  <!-- Mensagem sucesso -->
+  <div id="msg-sucesso" class="card">
+    <div class="icon">✅</div>
+    <h2>Cadastro enviado com sucesso!</h2>
+    <p style="margin-top:0.75rem;color:var(--muted)">Obrigado! Seu perfil será exibido no Banco de Fontes da ASCOM em breve.</p>
+    <p style="margin-top:0.5rem;color:var(--muted);font-size:0.875rem">Você pode atualizar seu cadastro a qualquer momento preenchendo este formulário novamente.</p>
+  </div>
+
+</main>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
+const SIGAA_JSON = '../dados/docentes-sigaa.json';
+
+// ─── Estado ────────────────────────────────────────────────────────────────
+let docentes = [];
+let docenteAtual = null;
+let tags = [];
+let formacaoCount = 0;
+
+// ─── Carrega base SIGAA ────────────────────────────────────────────────────
+fetch(SIGAA_JSON)
+  .then(r => r.json())
+  .then(d => { docentes = d.docentes || []; })
+  .catch(() => { /* continua sem auto-fill se offline */ });
+
+// ─── Busca SIAPE ───────────────────────────────────────────────────────────
+function buscarSiape() {
+  const siape = document.getElementById('siape').value.trim();
+  const erro = document.getElementById('erro-siape');
+  const confirmacao = document.getElementById('confirmacao');
+
+  erro.style.display = 'none';
+  confirmacao.style.display = 'none';
+  document.getElementById('card-disponivel').style.display = 'none';
+
+  if (!siape || siape.length < 6) {
+    erro.textContent = 'Digite um SIAPE válido (mínimo 6 dígitos).';
+    erro.style.display = 'block';
+    return;
+  }
+
+  docenteAtual = docentes.find(d => String(d.siape) === siape);
+
+  if (!docenteAtual) {
+    erro.textContent = 'SIAPE não encontrado na base de dados do SIGAA. Verifique o número informado.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('nome-confirmado').textContent = docenteAtual.nome;
+  document.getElementById('unidade-confirmada').textContent = docenteAtual.unidade;
+  confirmacao.style.display = 'block';
+  document.getElementById('card-disponivel').style.display = 'block';
+
+  // Scroll suave
+  setTimeout(() => document.getElementById('card-disponivel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+// Allow Enter no SIAPE
+document.getElementById('siape').addEventListener('keydown', e => {
+  if (e.key === 'Enter') buscarSiape();
+});
+
+// ─── Disponibilidade ───────────────────────────────────────────────────────
+function definirDisponibilidade(radio) {
+  const secao = document.getElementById('secao-cadastro');
+  const recusa = document.getElementById('msg-recusa');
+  const formContainer = document.getElementById('form-container');
+
+  if (radio.value === 'sim') {
+    secao.style.display = 'block';
+    recusa.style.display = 'none';
+    if (formacaoCount === 0) adicionarFormacao('Graduação'); // pré-adiciona
+    setTimeout(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  } else {
+    // Registra recusa
+    registrarRecusa();
+  }
+}
+
+function registrarRecusa() {
+  const siape = document.getElementById('siape').value.trim();
+  const nome = docenteAtual ? docenteAtual.nome : '';
+  const unidade = docenteAtual ? docenteAtual.unidade : '';
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ acao: 'recusa', siape, nome, unidade })
+  }).catch(() => {});
+
+  document.getElementById('form-container').style.display = 'none';
+  document.getElementById('msg-recusa').style.display = 'block';
+}
+
+// ─── Formações ─────────────────────────────────────────────────────────────
+function adicionarFormacao(nivelDefault) {
+  formacaoCount++;
+  const id = formacaoCount;
+  const container = document.getElementById('lista-formacoes');
+
+  const div = document.createElement('div');
+  div.className = 'formacao-item';
+  div.id = `formacao-${id}`;
+  div.innerHTML = `
+    <button class="btn-remover" onclick="removerFormacao(${id})" title="Remover">✕</button>
+    <div class="row-2" style="margin-bottom:0.75rem">
+      <div class="field-group" style="margin-bottom:0">
+        <label>Nível</label>
+        <select id="nivel-${id}" onchange="atualizarNivel(${id})">
+          <option value="Graduação" ${nivelDefault==='Graduação'?'selected':''}>Graduação</option>
+          <option value="Especialização">Especialização</option>
+          <option value="Mestrado">Mestrado</option>
+          <option value="Doutorado">Doutorado</option>
+          <option value="Pós-Doutorado">Pós-Doutorado</option>
+        </select>
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label>Ano de conclusão</label>
+        <input type="number" id="ano-${id}" placeholder="Ex: 2010" min="1960" max="2030">
+      </div>
+    </div>
+    <div class="field-group" style="margin-bottom:0.75rem">
+      <label>Curso / Título <span class="req">*</span></label>
+      <input type="text" id="curso-${id}" placeholder="Ex: Ciências Biológicas">
+    </div>
+    <div class="field-group" style="margin-bottom:0">
+      <label>Instituição <span class="req">*</span></label>
+      <input type="text" id="inst-${id}" placeholder="Ex: UFPA">
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function removerFormacao(id) {
+  const el = document.getElementById(`formacao-${id}`);
+  if (el) el.remove();
+}
+
+function atualizarNivel(id) {
+  // placeholder futuro
+}
+
+function coletarFormacoes() {
+  const items = document.querySelectorAll('.formacao-item');
+  return Array.from(items).map(item => {
+    const id = item.id.replace('formacao-', '');
+    return {
+      nivel: document.getElementById(`nivel-${id}`)?.value || '',
+      curso: document.getElementById(`curso-${id}`)?.value || '',
+      instituicao: document.getElementById(`inst-${id}`)?.value || '',
+      ano: document.getElementById(`ano-${id}`)?.value || ''
+    };
+  }).filter(f => f.curso || f.instituicao);
+}
+
+// ─── Tags ──────────────────────────────────────────────────────────────────
+function tagKeydown(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    adicionarTag(e.target.value);
+  } else if (e.key === 'Backspace' && e.target.value === '' && tags.length) {
+    removerTag(tags.length - 1);
+  }
+}
+function tagBlur() {
+  const input = document.getElementById('tag-input');
+  if (input.value.trim()) adicionarTag(input.value);
+}
+function adicionarTag(texto) {
+  const t = texto.trim().replace(/,$/, '');
+  if (!t || tags.includes(t)) {
+    document.getElementById('tag-input').value = '';
+    return;
+  }
+  tags.push(t);
+  renderTags();
+  document.getElementById('tag-input').value = '';
+}
+function removerTag(i) {
+  tags.splice(i, 1);
+  renderTags();
+}
+function renderTags() {
+  const container = document.getElementById('tags-container');
+  const input = document.getElementById('tag-input');
+  container.querySelectorAll('.tag').forEach(t => t.remove());
+  tags.forEach((t, i) => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.innerHTML = `${t} <button onclick="removerTag(${i})" type="button">×</button>`;
+    container.insertBefore(span, input);
+  });
+  document.getElementById('temas-value').value = tags.join(', ');
+}
+
+// ─── Contador resumo ───────────────────────────────────────────────────────
+document.getElementById('resumo').addEventListener('input', function() {
+  document.getElementById('conta-resumo').textContent = this.value.length;
+});
+
+// ─── Envio ─────────────────────────────────────────────────────────────────
+function enviar() {
+  if (!validar()) return;
+
+  const siape = document.getElementById('siape').value.trim();
+  const formatos = Array.from(document.querySelectorAll('input[name=formato]:checked')).map(c => c.value);
+
+  const dados = {
+    acao: 'cadastro',
+    siape,
+    nome: docenteAtual.nome,
+    unidade: docenteAtual.unidade,
+    disponivel: 'sim',
+    campus: document.getElementById('campus').value,
+    resumo: document.getElementById('resumo').value.trim(),
+    temas: tags.join(', '),
+    formatos: formatos.join(', '),
+    lattes: document.getElementById('lattes').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    whatsapp: document.getElementById('whatsapp').value.trim(),
+    observacao: document.getElementById('obs').value.trim(),
+    formacoes: coletarFormacoes()
+  };
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('btn-enviar').disabled = true;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(dados)
+  })
+  .then(r => r.json())
+  .then(resp => {
+    if (resp.status === 'ok') {
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('msg-sucesso').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      alert('Erro ao enviar: ' + (resp.msg || 'Tente novamente.'));
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('btn-enviar').disabled = false;
+    }
+  })
+  .catch(() => {
+    alert('Falha de conexão. Verifique sua internet e tente novamente.');
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('btn-enviar').disabled = false;
+  });
+}
+
+function validar() {
+  let ok = true;
+
+  function marcar(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('campo-erro');
+    el.addEventListener('input', () => el.classList.remove('campo-erro'), { once: true });
+    ok = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  if (!document.getElementById('campus').value) { marcar('campus'); ok = false; }
+  if (!document.getElementById('resumo').value.trim()) { marcar('resumo'); ok = false; }
+  if (!document.getElementById('email').value.trim()) { marcar('email'); ok = false; }
+  if (tags.length === 0) {
+    document.getElementById('tags-container').style.borderColor = 'var(--erro)';
+    ok = false;
+  }
+
+  const formacoes = coletarFormacoes();
+  if (formacoes.length === 0) {
+    alert('Adicione pelo menos uma formação acadêmica.');
+    ok = false;
+  }
+
+  return ok;
+}
+</script>
+</body>
+</html>
