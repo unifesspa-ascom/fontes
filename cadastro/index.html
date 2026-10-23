@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Banco de Fontes UNIFESSPA — Cadastro de Docente</title>
+  <title>Cadastro de docente | Banco de fontes Unifesspa</title>
   <style>
     :root {
-      --verde: #1a5c2a;
-      --verde-claro: #2d8a42;
+      --verde: #14763c;
+      --verde-claro: #0e5a2d;
       --amarelo: #f5c518;
-      --bg: #f8f9fa;
-      --card: #ffffff;
+      --bg: #edefec;
+      --card: #fffffc;
       --texto: #212529;
       --muted: #6c757d;
       --borda: #dee2e6;
@@ -34,14 +34,19 @@
       min-height: 100vh;
     }
     header {
-      background: var(--verde);
-      color: #fff;
-      padding: 1.25rem 1rem;
+      background: var(--card);
+      color: var(--texto);
+      border-bottom: 1px solid var(--borda);
+      padding: 1.1rem 1rem;
       text-align: center;
     }
+    header a { color: inherit; text-decoration: none; }
+    .voltar { display:inline-block; margin-top:.4rem; font-size:.85rem; color: var(--verde) !important; font-weight:600; }
     header img { height: 48px; margin-bottom: 0.5rem; }
-    header h1 { font-size: 1.3rem; font-weight: 700; }
-    header p { font-size: 0.875rem; opacity: 0.85; margin-top: 0.25rem; }
+    header h1 { font-size: 1.3rem; font-weight: 700; color: var(--verde); }
+    header p { font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem; }
+    .isca { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    #aviso-situacao { display:none; margin-top:.6rem; font-size:.85rem; color: var(--muted); }
     main {
       max-width: 700px;
       margin: 2rem auto;
@@ -70,11 +75,11 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--verde-claro);
-      box-shadow: 0 0 0 3px rgba(45,138,66,0.15);
+      box-shadow: 0 0 0 3px rgba(20,118,60,0.18);
     }
     input[readonly] { background: var(--bg); cursor: not-allowed; }
     textarea { resize: vertical; min-height: 100px; }
-    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
     .field-group { margin-bottom: 1.25rem; }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 500px) { .row-2 { grid-template-columns: 1fr; } }
@@ -99,7 +104,7 @@
     /* Confirmação do professor */
     #confirmacao {
       display: none;
-      background: #e8f5e9;
+      background: #e2f4e7;
       border: 1.5px solid #a5d6a7;
       border-radius: 8px;
       padding: 0.85rem 1rem;
@@ -124,7 +129,7 @@
     .radio-group input[type=radio] { accent-color: var(--verde); }
     .radio-group label:has(input:checked) {
       border-color: var(--verde);
-      background: #e8f5e9;
+      background: #e2f4e7;
       font-weight: 600;
     }
 
@@ -160,16 +165,16 @@
       cursor: pointer;
       margin-top: 0.25rem;
     }
-    .btn-add:hover { background: #e8f5e9; }
+    .btn-add:hover { background: #e2f4e7; }
 
     /* Tags temas */
     .tags-input { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
       border: 1.5px solid var(--borda); border-radius: 8px; padding: 0.4rem 0.6rem;
       cursor: text; min-height: 2.5rem; }
-    .tags-input:focus-within { border-color: var(--verde-claro); box-shadow: 0 0 0 3px rgba(45,138,66,0.15); }
+    .tags-input:focus-within { border-color: var(--verde-claro); box-shadow: 0 0 0 3px rgba(20,118,60,0.18); }
     .tag {
       display: inline-flex; align-items: center; gap: 0.25rem;
-      background: #e8f5e9; color: var(--verde);
+      background: #e2f4e7; color: var(--verde);
       border-radius: 4px; padding: 0.15rem 0.5rem;
       font-size: 0.82rem; font-weight: 600;
     }
@@ -189,7 +194,7 @@
       cursor: pointer; font-size: 0.875rem; font-weight: 400;
       transition: all 0.2s;
     }
-    .check-item:has(input:checked) { border-color: var(--verde); background: #e8f5e9; font-weight: 600; }
+    .check-item:has(input:checked) { border-color: var(--verde); background: #e2f4e7; font-weight: 600; }
     .check-item input { accent-color: var(--verde); }
 
     /* Progresso */
@@ -235,8 +240,9 @@
 <body>
 
 <header>
-  <h1>🎓 Banco de Fontes UNIFESSPA</h1>
+  <h1>Banco de fontes</h1>
   <p>Cadastro de docente para atendimento à imprensa</p>
+  <a class="voltar" href="../">← Voltar à busca</a>
 </header>
 
 <main>
@@ -249,14 +255,15 @@
       <div class="field-group">
         <label for="siape">Número SIAPE <span class="req">*</span></label>
         <div class="siape-row">
-          <input type="number" id="siape" placeholder="Ex: 1234567" min="1000000" max="9999999">
-          <button class="btn-lookup" onclick="buscarSiape()">Buscar</button>
+          <input type="text" inputmode="numeric" autocomplete="off" id="siape" placeholder="Ex: 1234567" maxlength="8">
+          <button class="btn-lookup" id="btn-buscar" type="button" onclick="buscarSiape()">Buscar</button>
         </div>
-        <p class="hint">Digite seu número SIAPE (7 dígitos) para preencher automaticamente seus dados.</p>
-        <p class="msg-erro" id="erro-siape">SIAPE não encontrado na base de dados do SIGAA. Verifique o número informado.</p>
+        <p class="hint">Digite seu número SIAPE para localizar seus dados. Ele só é usado para conferir seu vínculo e não aparece no site.</p>
+        <p class="msg-erro" id="erro-siape" role="alert"></p>
       </div>
       <div id="confirmacao">
-        É você? <strong id="nome-confirmado"></strong> — <em id="unidade-confirmada"></em>
+        É você? <strong id="nome-confirmado"></strong> | <em id="unidade-confirmada"></em>
+        <div id="aviso-situacao"></div>
       </div>
     </div>
 
@@ -318,26 +325,27 @@
         <div class="field-group">
           <label>Formatos de atendimento</label>
           <div class="checkbox-grid">
-            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista presencial"> Entrevista presencial</label>
-            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista por vídeo"> Entrevista por vídeo</label>
-            <label class="check-item"><input type="checkbox" name="formato" value="Entrevista por telefone"> Entrevista por telefone</label>
-            <label class="check-item"><input type="checkbox" name="formato" value="Respostas por escrito"> Respostas por escrito</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Presencial"> Presencial</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="TV ou vídeo"> TV ou vídeo</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Rádio ou áudio"> Rádio ou áudio</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="E-mail"> E-mail</label>
           </div>
         </div>
 
         <div class="field-group">
           <label for="lattes">Link do Lattes</label>
-          <input type="url" id="lattes" placeholder="http://lattes.cnpq.br/...">
+          <input type="url" id="lattes" placeholder="http://lattes.cnpq.br/..."><p class="hint">Use o endereço do Currículo Lattes (cnpq.br).</p>
         </div>
       </div>
 
       <div class="card">
         <h2>5. Contato (não público)</h2>
-        <p class="hint" style="margin-bottom:1rem">Esses dados ficam visíveis apenas para a equipe da ASCOM — não aparecem no site.</p>
+        <p class="hint" style="margin-bottom:1rem">Esses dados ficam visíveis apenas para a equipe da ASCOM e não aparecem no site. Enviaremos um link de confirmação para o e-mail institucional.</p>
         <div class="row-2">
           <div class="field-group">
             <label for="email">E-mail institucional <span class="req">*</span></label>
-            <input type="email" id="email" placeholder="nome@unifesspa.edu.br">
+            <input type="email" id="email" placeholder="nome@unifesspa.edu.br" autocomplete="email">
+            <p class="msg-erro" id="erro-email">Use um e-mail @unifesspa.edu.br.</p>
           </div>
           <div class="field-group">
             <label for="whatsapp">WhatsApp</label>
@@ -354,9 +362,11 @@
         </div>
       </div>
 
+      <div class="isca" aria-hidden="true"><label>Não preencha <input type="text" id="site" tabindex="-1" autocomplete="off"></label></div>
+      <p class="msg-erro" id="erro-envio" role="alert" style="margin-bottom:.75rem"></p>
       <div id="loading"><span class="spinner"></span> Enviando...</div>
 
-      <button class="btn-submit" id="btn-enviar" onclick="enviar()">Enviar cadastro</button>
+      <button class="btn-submit" id="btn-enviar" type="button" onclick="enviar()">Enviar cadastro</button>
     </div><!-- /secao-cadastro -->
 
   </div><!-- /form-container -->
@@ -370,10 +380,10 @@
 
   <!-- Mensagem sucesso -->
   <div id="msg-sucesso" class="card">
-    <div class="icon">✅</div>
-    <h2>Cadastro enviado com sucesso!</h2>
-    <p style="margin-top:0.75rem;color:var(--muted)">Obrigado! Seu perfil será exibido no Banco de Fontes da ASCOM em breve.</p>
-    <p style="margin-top:0.5rem;color:var(--muted);font-size:0.875rem">Você pode atualizar seu cadastro a qualquer momento preenchendo este formulário novamente.</p>
+    <div class="icon">✉️</div>
+    <h2>Falta só confirmar o e-mail</h2>
+    <p style="margin-top:0.75rem;color:var(--muted)">Enviamos um link de confirmação para o e-mail institucional informado. Abra a mensagem e clique no link em até 48 horas. Se não encontrar, olhe a caixa de spam.</p>
+    <p style="margin-top:0.5rem;color:var(--muted);font-size:0.875rem">Depois da confirmação, a ASCOM revisa o cadastro e o publica no Banco de fontes. Para atualizar dados, preencha o formulário de novo: o novo cadastro substitui o anterior depois de aprovado.</p>
   </div>
 
 </main>
@@ -381,111 +391,114 @@
 <script>
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
-const SIGAA_JSON = '../dados/docentes-sigaa.json';
+const DOMINIO_EMAIL = '@unifesspa.edu.br';
 
 // ─── Estado ────────────────────────────────────────────────────────────────
-let docentes = [];
 let docenteAtual = null;
 let tags = [];
 let formacaoCount = 0;
+const $ = id => document.getElementById(id);
 
-// ─── Carrega base SIGAA ────────────────────────────────────────────────────
-fetch(SIGAA_JSON)
-  .then(r => r.json())
-  .then(d => { docentes = d.docentes || []; })
-  .catch(() => { /* continua sem auto-fill se offline */ });
-
-// ─── Busca SIAPE ───────────────────────────────────────────────────────────
-function buscarSiape() {
-  const siape = document.getElementById('siape').value.trim();
-  const erro = document.getElementById('erro-siape');
-  const confirmacao = document.getElementById('confirmacao');
-
-  erro.style.display = 'none';
-  confirmacao.style.display = 'none';
-  document.getElementById('card-disponivel').style.display = 'none';
-
-  if (!siape || siape.length < 6) {
-    erro.textContent = 'Digite um SIAPE válido (mínimo 6 dígitos).';
-    erro.style.display = 'block';
-    return;
-  }
-
-  docenteAtual = docentes.find(d => String(d.siape) === siape);
-
-  if (!docenteAtual) {
-    erro.textContent = 'SIAPE não encontrado na base de dados do SIGAA. Verifique o número informado.';
-    erro.style.display = 'block';
-    return;
-  }
-
-  document.getElementById('nome-confirmado').textContent = docenteAtual.nome;
-  document.getElementById('unidade-confirmada').textContent = docenteAtual.unidade;
-  confirmacao.style.display = 'block';
-  document.getElementById('card-disponivel').style.display = 'block';
-
-  // Scroll suave
-  setTimeout(() => document.getElementById('card-disponivel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+function chamar(dados) {
+  return fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(dados)
+  }).then(r => r.json());
 }
 
-// Allow Enter no SIAPE
-document.getElementById('siape').addEventListener('keydown', e => {
-  if (e.key === 'Enter') buscarSiape();
-});
+// ─── Busca SIAPE (conferida no servidor) ───────────────────────────────────
+function buscarSiape() {
+  const siape = $('siape').value.replace(/\D/g, '');
+  const erro = $('erro-siape');
+  erro.style.display = 'none';
+  $('confirmacao').style.display = 'none';
+  $('card-disponivel').style.display = 'none';
+  docenteAtual = null;
+
+  if (siape.length < 6 || siape.length > 8) {
+    erro.textContent = 'Digite um SIAPE válido (de 6 a 8 dígitos).';
+    erro.style.display = 'block';
+    return;
+  }
+  const btn = $('btn-buscar');
+  btn.disabled = true; btn.textContent = 'Buscando...';
+  chamar({ acao: 'verificar', siape })
+    .then(r => {
+      if (r.status !== 'ok') {
+        erro.textContent = r.msg || 'Não foi possível verificar o SIAPE.';
+        erro.style.display = 'block';
+        return;
+      }
+      docenteAtual = { siape, nome: r.nome, unidade: r.unidade, situacao: r.situacao };
+      $('nome-confirmado').textContent = r.nome;
+      $('unidade-confirmada').textContent = r.unidade;
+      const aviso = $('aviso-situacao');
+      const textos = {
+        cadastrado: 'Você já tem um cadastro publicado. Um novo envio substituirá o atual depois de aprovado pela ASCOM.',
+        pendente: 'Há um cadastro seu em andamento. Um novo envio será analisado como atualização.',
+        recusou: 'Você tinha informado que não quer participar. Pode mudar de ideia aqui.'
+      };
+      aviso.textContent = textos[r.situacao] || '';
+      aviso.style.display = textos[r.situacao] ? 'block' : 'none';
+      $('confirmacao').style.display = 'block';
+      $('card-disponivel').style.display = 'block';
+      setTimeout(() => $('card-disponivel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    })
+    .catch(() => {
+      erro.textContent = 'Falha de conexão. Tente novamente.';
+      erro.style.display = 'block';
+    })
+    .finally(() => { btn.disabled = false; btn.textContent = 'Buscar'; });
+}
+$('siape').addEventListener('keydown', e => { if (e.key === 'Enter') buscarSiape(); });
 
 // ─── Disponibilidade ───────────────────────────────────────────────────────
 function definirDisponibilidade(radio) {
-  const secao = document.getElementById('secao-cadastro');
-  const recusa = document.getElementById('msg-recusa');
-  const formContainer = document.getElementById('form-container');
-
+  const secao = $('secao-cadastro');
   if (radio.value === 'sim') {
     secao.style.display = 'block';
-    recusa.style.display = 'none';
-    if (formacaoCount === 0) adicionarFormacao('Graduação'); // pré-adiciona
+    $('msg-recusa').style.display = 'none';
+    if (formacaoCount === 0) adicionarFormacao('Graduação');
     setTimeout(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   } else {
-    // Registra recusa
     registrarRecusa();
   }
 }
 
 function registrarRecusa() {
-  const siape = document.getElementById('siape').value.trim();
-  const nome = docenteAtual ? docenteAtual.nome : '';
-  const unidade = docenteAtual ? docenteAtual.unidade : '';
-
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ acao: 'recusa', siape, nome, unidade })
-  }).catch(() => {});
-
-  document.getElementById('form-container').style.display = 'none';
-  document.getElementById('msg-recusa').style.display = 'block';
+  if (!docenteAtual) return;
+  chamar({ acao: 'recusa', siape: docenteAtual.siape, site: $('site').value })
+    .then(r => {
+      if (r.status !== 'ok') {
+        alert(r.msg || 'Não foi possível registrar a resposta.');
+        document.querySelectorAll('input[name=disponivel]').forEach(i => { i.checked = false; });
+        return;
+      }
+      $('form-container').style.display = 'none';
+      $('msg-recusa').style.display = 'block';
+    })
+    .catch(() => {
+      alert('Falha de conexão. Tente novamente.');
+      document.querySelectorAll('input[name=disponivel]').forEach(i => { i.checked = false; });
+    });
 }
 
 // ─── Formações ─────────────────────────────────────────────────────────────
 function adicionarFormacao(nivelDefault) {
   formacaoCount++;
   const id = formacaoCount;
-  const container = document.getElementById('lista-formacoes');
-
   const div = document.createElement('div');
   div.className = 'formacao-item';
   div.id = `formacao-${id}`;
+  const niveis = ['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado']
+    .map(n => `<option value="${n}" ${nivelDefault === n ? 'selected' : ''}>${n}</option>`).join('');
   div.innerHTML = `
-    <button class="btn-remover" onclick="removerFormacao(${id})" title="Remover">✕</button>
+    <button class="btn-remover" type="button" onclick="removerFormacao(${id})" title="Remover">✕</button>
     <div class="row-2" style="margin-bottom:0.75rem">
       <div class="field-group" style="margin-bottom:0">
         <label>Nível</label>
-        <select id="nivel-${id}" onchange="atualizarNivel(${id})">
-          <option value="Graduação" ${nivelDefault==='Graduação'?'selected':''}>Graduação</option>
-          <option value="Especialização">Especialização</option>
-          <option value="Mestrado">Mestrado</option>
-          <option value="Doutorado">Doutorado</option>
-          <option value="Pós-Doutorado">Pós-Doutorado</option>
-        </select>
+        <select id="nivel-${id}">${niveis}</select>
       </div>
       <div class="field-group" style="margin-bottom:0">
         <label>Ano de conclusão</label>
@@ -494,36 +507,27 @@ function adicionarFormacao(nivelDefault) {
     </div>
     <div class="field-group" style="margin-bottom:0.75rem">
       <label>Curso / Título <span class="req">*</span></label>
-      <input type="text" id="curso-${id}" placeholder="Ex: Ciências Biológicas">
+      <input type="text" id="curso-${id}" placeholder="Ex: Ciências Biológicas" maxlength="120">
     </div>
     <div class="field-group" style="margin-bottom:0">
       <label>Instituição <span class="req">*</span></label>
-      <input type="text" id="inst-${id}" placeholder="Ex: UFPA">
+      <input type="text" id="inst-${id}" placeholder="Ex: UFPA" maxlength="120">
     </div>
   `;
-  container.appendChild(div);
+  $('lista-formacoes').appendChild(div);
 }
-
-function removerFormacao(id) {
-  const el = document.getElementById(`formacao-${id}`);
-  if (el) el.remove();
-}
-
-function atualizarNivel(id) {
-  // placeholder futuro
-}
+function removerFormacao(id) { const el = $(`formacao-${id}`); if (el) el.remove(); }
 
 function coletarFormacoes() {
-  const items = document.querySelectorAll('.formacao-item');
-  return Array.from(items).map(item => {
+  return Array.from(document.querySelectorAll('.formacao-item')).map(item => {
     const id = item.id.replace('formacao-', '');
     return {
-      nivel: document.getElementById(`nivel-${id}`)?.value || '',
-      curso: document.getElementById(`curso-${id}`)?.value || '',
-      instituicao: document.getElementById(`inst-${id}`)?.value || '',
-      ano: document.getElementById(`ano-${id}`)?.value || ''
+      nivel: $(`nivel-${id}`).value,
+      curso: $(`curso-${id}`).value.trim(),
+      instituicao: $(`inst-${id}`).value.trim(),
+      ano: $(`ano-${id}`).value
     };
-  }).filter(f => f.curso || f.instituicao);
+  }).filter(f => f.curso && f.instituicao);
 }
 
 // ─── Tags ──────────────────────────────────────────────────────────────────
@@ -536,118 +540,107 @@ function tagKeydown(e) {
   }
 }
 function tagBlur() {
-  const input = document.getElementById('tag-input');
+  const input = $('tag-input');
   if (input.value.trim()) adicionarTag(input.value);
 }
 function adicionarTag(texto) {
-  const t = texto.trim().replace(/,$/, '');
-  if (!t || tags.includes(t)) {
-    document.getElementById('tag-input').value = '';
-    return;
-  }
+  const t = texto.trim().replace(/,/g, ' ').replace(/\s+/g, ' ').slice(0, 60);
+  $('tag-input').value = '';
+  if (!t || tags.some(x => x.toLowerCase() === t.toLowerCase()) || tags.length >= 12) return;
   tags.push(t);
   renderTags();
-  document.getElementById('tag-input').value = '';
+  $('tags-container').style.borderColor = '';
 }
-function removerTag(i) {
-  tags.splice(i, 1);
-  renderTags();
-}
+function removerTag(i) { tags.splice(i, 1); renderTags(); }
 function renderTags() {
-  const container = document.getElementById('tags-container');
-  const input = document.getElementById('tag-input');
+  const container = $('tags-container');
+  const input = $('tag-input');
   container.querySelectorAll('.tag').forEach(t => t.remove());
   tags.forEach((t, i) => {
     const span = document.createElement('span');
     span.className = 'tag';
-    span.innerHTML = `${t} <button onclick="removerTag(${i})" type="button">×</button>`;
+    span.appendChild(document.createTextNode(t + ' '));
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = '×'; b.setAttribute('aria-label', 'Remover ' + t);
+    b.addEventListener('click', () => removerTag(i));
+    span.appendChild(b);
     container.insertBefore(span, input);
   });
-  document.getElementById('temas-value').value = tags.join(', ');
 }
 
 // ─── Contador resumo ───────────────────────────────────────────────────────
-document.getElementById('resumo').addEventListener('input', function() {
-  document.getElementById('conta-resumo').textContent = this.value.length;
-});
+$('resumo').addEventListener('input', function () { $('conta-resumo').textContent = this.value.length; });
 
 // ─── Envio ─────────────────────────────────────────────────────────────────
+function emailValido(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.toLowerCase().endsWith(DOMINIO_EMAIL);
+}
+
 function enviar() {
-  if (!validar()) return;
-
-  const siape = document.getElementById('siape').value.trim();
+  if (!docenteAtual || !validar()) return;
   const formatos = Array.from(document.querySelectorAll('input[name=formato]:checked')).map(c => c.value);
-
   const dados = {
     acao: 'cadastro',
-    siape,
-    nome: docenteAtual.nome,
-    unidade: docenteAtual.unidade,
-    disponivel: 'sim',
-    campus: document.getElementById('campus').value,
-    resumo: document.getElementById('resumo').value.trim(),
-    temas: tags.join(', '),
-    formatos: formatos.join(', '),
-    lattes: document.getElementById('lattes').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    whatsapp: document.getElementById('whatsapp').value.trim(),
-    observacao: document.getElementById('obs').value.trim(),
-    formacoes: coletarFormacoes()
+    siape: docenteAtual.siape,
+    campus: $('campus').value,
+    resumo: $('resumo').value.trim(),
+    temas: tags,
+    formatos,
+    lattes: $('lattes').value.trim(),
+    email: $('email').value.trim(),
+    whatsapp: $('whatsapp').value.trim(),
+    observacao: $('obs').value.trim(),
+    formacoes: coletarFormacoes(),
+    site: $('site').value
   };
+  $('erro-envio').style.display = 'none';
+  $('loading').style.display = 'block';
+  $('btn-enviar').disabled = true;
 
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('btn-enviar').disabled = true;
-
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(dados)
-  })
-  .then(r => r.json())
-  .then(resp => {
-    if (resp.status === 'ok') {
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('msg-sucesso').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      alert('Erro ao enviar: ' + (resp.msg || 'Tente novamente.'));
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('btn-enviar').disabled = false;
-    }
-  })
-  .catch(() => {
-    alert('Falha de conexão. Verifique sua internet e tente novamente.');
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('btn-enviar').disabled = false;
-  });
+  chamar(dados)
+    .then(resp => {
+      if (resp.status === 'ok') {
+        $('form-container').style.display = 'none';
+        $('msg-sucesso').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        $('erro-envio').textContent = resp.msg || 'Não foi possível enviar. Tente novamente.';
+        $('erro-envio').style.display = 'block';
+        $('loading').style.display = 'none';
+        $('btn-enviar').disabled = false;
+      }
+    })
+    .catch(() => {
+      $('erro-envio').textContent = 'Falha de conexão. Verifique a internet e tente novamente.';
+      $('erro-envio').style.display = 'block';
+      $('loading').style.display = 'none';
+      $('btn-enviar').disabled = false;
+    });
 }
 
 function validar() {
   let ok = true;
-
-  function marcar(id, msg) {
-    const el = document.getElementById(id);
-    if (!el) return;
+  let primeiro = null;
+  function marcar(id) {
+    const el = $(id);
     el.classList.add('campo-erro');
     el.addEventListener('input', () => el.classList.remove('campo-erro'), { once: true });
     ok = false;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!primeiro) primeiro = el;
   }
-
-  if (!document.getElementById('campus').value) { marcar('campus'); ok = false; }
-  if (!document.getElementById('resumo').value.trim()) { marcar('resumo'); ok = false; }
-  if (!document.getElementById('email').value.trim()) { marcar('email'); ok = false; }
-  if (tags.length === 0) {
-    document.getElementById('tags-container').style.borderColor = 'var(--erro)';
+  if (!$('campus').value) marcar('campus');
+  if ($('resumo').value.trim().length < 20) marcar('resumo');
+  const em = $('email').value.trim();
+  $('erro-email').style.display = 'none';
+  if (!emailValido(em)) { marcar('email'); $('erro-email').style.display = 'block'; }
+  if (tags.length === 0) { $('tags-container').style.borderColor = 'var(--erro)'; ok = false; if (!primeiro) primeiro = $('tags-container'); }
+  if (coletarFormacoes().length === 0) {
+    const e = $('erro-envio');
+    e.textContent = 'Adicione pelo menos uma formação, com curso e instituição.';
+    e.style.display = 'block';
     ok = false;
   }
-
-  const formacoes = coletarFormacoes();
-  if (formacoes.length === 0) {
-    alert('Adicione pelo menos uma formação acadêmica.');
-    ok = false;
-  }
-
+  if (primeiro) primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return ok;
 }
 </script>
