@@ -1,574 +1,220 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASCOM — Banco de Fontes UNIFESSPA</title>
-  <style>
-    :root {
-      --verde: #1a5c2a;
-      --verde-claro: #2d8a42;
-      --amarelo: #f5c518;
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --texto: #212529;
-      --muted: #6c757d;
-      --borda: #dee2e6;
-      --tag-bg: #e8f5e9;
-      --tag-cor: #1a5c2a;
-      --vermelho: #c0392b;
-      --azul: #2471a3;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--texto); }
-
-    /* Login */
-    #tela-login {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--verde);
-    }
-    .login-box {
-      background: #fff;
-      border-radius: 18px;
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      text-align: center;
-    }
-    .login-box h1 { font-size: 1.3rem; color: var(--verde); margin-bottom: 0.25rem; }
-    .login-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
-    .login-box input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1.5px solid var(--borda);
-      border-radius: 10px;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-      text-align: center;
-      letter-spacing: 0.1em;
-    }
-    .login-box input:focus { outline: none; border-color: var(--verde-claro); }
-    .btn-entrar {
-      width: 100%;
-      padding: 0.8rem;
-      background: var(--verde);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .btn-entrar:hover { background: var(--verde-claro); }
-    #erro-login { color: var(--vermelho); font-size: 0.85rem; margin-top: 0.75rem; display: none; }
-
-    /* App */
-    #app { display: none; }
-
-    header {
-      background: var(--verde);
-      color: #fff;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    header h1 { font-size: 1.2rem; font-weight: 800; }
-    header p { font-size: 0.8rem; opacity: 0.85; }
-    .btn-sair {
-      padding: 0.4rem 1rem;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    /* Tabs */
-    .tabs {
-      max-width: 1200px;
-      margin: 1.5rem auto 0;
-      padding: 0 1rem;
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .tab {
-      padding: 0.5rem 1.25rem;
-      border-radius: 8px;
-      border: 1.5px solid var(--borda);
-      background: var(--card);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
-      transition: all 0.15s;
-    }
-    .tab.active { background: var(--verde); color: #fff; border-color: var(--verde); }
-    .tab-count {
-      display: inline-block;
-      background: rgba(0,0,0,0.12);
-      border-radius: 4px;
-      padding: 0 5px;
-      font-size: 0.75rem;
-      margin-left: 0.3rem;
-    }
-
-    /* Barra de busca */
-    .search-bar {
-      max-width: 1200px;
-      margin: 1rem auto 0;
-      padding: 0 1rem;
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .search-bar input, .search-bar select {
-      padding: 0.6rem 1rem;
-      border: 1.5px solid var(--borda);
-      border-radius: 10px;
-      font-size: 0.9rem;
-      background: var(--card);
-      color: var(--texto);
-    }
-    .search-bar input { flex: 1; min-width: 200px; }
-    .search-bar input:focus, .search-bar select:focus { outline: none; border-color: var(--verde-claro); }
-
-    /* Info */
-    #total-info {
-      max-width: 1200px;
-      margin: 0.75rem auto 0;
-      padding: 0 1rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    /* Grid */
-    .grid {
-      max-width: 1200px;
-      margin: 1rem auto 4rem;
-      padding: 0 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 1.25rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .card-nome { font-weight: 700; font-size: 1rem; color: var(--verde); }
-    .card-unidade { font-size: 0.8rem; color: var(--muted); }
-    .card-campus { font-size: 0.78rem; color: var(--muted); font-style: italic; }
-    .card-siape { font-size: 0.78rem; color: var(--muted); }
-    .card-formacao { font-size: 0.8rem; color: var(--muted); }
-    .card-resumo { font-size: 0.85rem; color: var(--texto); line-height: 1.5; }
-
-    .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.15rem; }
-    .tag {
-      background: var(--tag-bg);
-      color: var(--tag-cor);
-      border-radius: 4px;
-      padding: 0.15rem 0.5rem;
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-
-    .contatos {
-      background: #f0f8f1;
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-top: 0.25rem;
-    }
-    .contatos h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--verde); margin-bottom: 0.4rem; }
-    .contato-linha { font-size: 0.85rem; margin-bottom: 0.2rem; }
-    .contato-linha a { color: var(--verde); text-decoration: none; }
-    .contato-linha a:hover { text-decoration: underline; }
-
-    /* Não cadastrado card */
-    .card-nc {
-      background: var(--card);
-      border-radius: 10px;
-      padding: 0.9rem 1.1rem;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    }
-    .card-nc-nome { font-weight: 600; font-size: 0.9rem; }
-    .card-nc-info { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
-
-    /* Recusou badge */
-    .badge-recusa {
-      display: inline-block;
-      background: #fdecea;
-      color: var(--vermelho);
-      border-radius: 4px;
-      padding: 0.1rem 0.5rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-    }
-
-    /* Loading */
-    .spinner {
-      display: inline-block; width: 24px; height: 24px;
-      border: 3px solid var(--borda); border-top-color: var(--verde);
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loading-app { text-align: center; padding: 3rem; }
-
-    .empty { text-align: center; color: var(--muted); padding: 3rem 1rem; }
-
-    /* Exportar */
-    .bar-acoes {
-      max-width: 1200px;
-      margin: 0 auto 0;
-      padding: 0 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 0.5rem;
-    }
-    .btn-exportar {
-      padding: 0.45rem 1rem;
-      background: var(--verde);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-exportar:hover { background: var(--verde-claro); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel da ASCOM | Banco de fontes</title>
+<style>
+  :root { --bg:#edefec; --card:#fffffc; --texto:#1f2a24; --muted:#5d6a63; --borda:#cfd6d1; --verde:#14763c; --verde-escuro:#0e5a2d; --tag-bg:#e2f4e7; --tag-cor:#14763c; --erro:#b3261e; --sombra:0 1px 3px rgba(20,40,28,.12),0 6px 18px rgba(20,40,28,.06); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#101512; --card:#18201b; --texto:#e6ece8; --muted:#9fada5; --borda:#2f3b34; --verde:#4fbf79; --verde-escuro:#3aa563; --tag-bg:#1d3626; --tag-cor:#8be0a8; --erro:#ffb4ab; --sombra:0 1px 3px rgba(0,0,0,.5); } }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--texto); line-height:1.45; }
+  button,input,select { font:inherit; color:inherit; }
+  :focus-visible { outline:3px solid #f5c518; outline-offset:2px; }
+  header { background:var(--card); border-bottom:1px solid var(--borda); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  header h1 { font-size:1.2rem; color:var(--verde); }
+  header p { color:var(--muted); font-size:.88rem; }
+  main { max-width:1100px; margin:0 auto; padding:20px; }
+  .caixa { background:var(--card); border-radius:12px; padding:22px; box-shadow:var(--sombra); }
+  .login { max-width:380px; margin:48px auto; }
+  .login h2 { font-size:1.1rem; margin-bottom:12px; }
+  label { display:block; font-weight:600; font-size:.9rem; margin:10px 0 4px; }
+  input[type=password], input[type=search], select { width:100%; padding:11px 12px; border:1px solid var(--borda); border-radius:8px; background:var(--card); min-height:44px; }
+  .btn { border:1px solid var(--borda); background:var(--card); padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; }
+  .btn:hover { border-color:var(--verde); }
+  .btn.pri { background:var(--verde); border-color:var(--verde); color:#fff; }
+  .btn.pri:hover { background:var(--verde-escuro); }
+  .btn.perigo { color:var(--erro); }
+  .btn:disabled { opacity:.6; cursor:not-allowed; }
+  .erro { color:var(--erro); font-size:.9rem; margin-top:10px; min-height:1.2em; }
+  .abas { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .aba { border:1px solid var(--borda); background:var(--card); padding:9px 14px; border-radius:999px; cursor:pointer; font-weight:600; font-size:.9rem; }
+  .aba[aria-selected="true"] { background:var(--tag-bg); color:var(--tag-cor); border-color:var(--verde); }
+  .aba .n { opacity:.75; margin-left:4px; }
+  .lista { display:grid; gap:14px; }
+  .item { background:var(--card); border-radius:12px; padding:18px; box-shadow:var(--sombra); }
+  .item h3 { font-size:1.05rem; }
+  .item .un { color:var(--muted); font-size:.88rem; }
+  .linha { margin-top:8px; font-size:.92rem; }
+  .linha b { color:var(--muted); font-weight:600; }
+  .selo { display:inline-block; font-size:.78rem; font-weight:700; padding:2px 10px; border-radius:999px; background:var(--tag-bg); color:var(--tag-cor); margin-left:8px; vertical-align:middle; }
+  .acoes { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .barra { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .barra input { flex:1; min-width:220px; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:var(--sombra); font-size:.9rem; }
+  th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--borda); }
+  th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+  .vazio { color:var(--muted); text-align:center; padding:28px; }
+  .tabela-wrap { overflow-x:auto; }
+  [hidden] { display:none !important; }
+</style>
 </head>
 <body>
+<header>
+  <div><h1>Painel da ASCOM</h1><p>Banco de fontes da Unifesspa. Uso interno, com dados de contato.</p></div>
+  <button class="btn" id="sair" hidden>Sair</button>
+</header>
+<main>
+  <form class="caixa login" id="login" autocomplete="off">
+    <h2>Entrar</h2>
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" autocomplete="current-password" required>
+    <p class="erro" id="erro-login" role="alert"></p>
+    <button class="btn pri" id="entrar" type="submit" style="width:100%;margin-top:8px">Entrar</button>
+  </form>
 
-<!-- Tela de login -->
-<div id="tela-login">
-  <div class="login-box">
-    <h1>🔐 ASCOM UNIFESSPA</h1>
-    <p>Banco de Fontes — Painel interno</p>
-    <input type="password" id="senha-input" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')entrar()">
-    <button class="btn-entrar" onclick="entrar()">Entrar</button>
-    <div id="erro-login">Senha incorreta. Tente novamente.</div>
-  </div>
-</div>
-
-<!-- App principal -->
-<div id="app">
-  <header>
-    <div>
-      <h1>🎓 ASCOM — Banco de Fontes UNIFESSPA</h1>
-      <p>Painel interno · dados completos com contatos</p>
-    </div>
-    <button class="btn-sair" onclick="sair()">Sair</button>
-  </header>
-
-  <div class="tabs" id="tabs">
-    <button class="tab active" onclick="mudarAba('disponiveis')" id="tab-disponiveis">
-      ✅ Disponíveis <span class="tab-count" id="cnt-disponiveis">0</span>
-    </button>
-    <button class="tab" onclick="mudarAba('recusaram')" id="tab-recusaram">
-      ❌ Recusaram <span class="tab-count" id="cnt-recusaram">0</span>
-    </button>
-    <button class="tab" onclick="mudarAba('nao-cadastrados')" id="tab-nc">
-      ⏳ Não cadastrados <span class="tab-count" id="cnt-nc">0</span>
-    </button>
-  </div>
-
-  <div class="search-bar">
-    <input type="text" id="busca" placeholder="🔍 Buscar por nome, área, unidade..." oninput="filtrar()">
-    <select id="filtro-campus" onchange="filtrar()">
-      <option value="">Todos os campi</option>
-      <option>Marabá (Campus Sede)</option>
-      <option>Xinguara</option>
-      <option>Rondon do Pará</option>
-      <option>São Félix do Xingu</option>
-      <option>Altamira</option>
-      <option>Santana do Araguaia</option>
-      <option>São Geraldo do Araguaia</option>
-      <option>Conceição do Araguaia</option>
-    </select>
-  </div>
-
-  <div class="bar-acoes" style="margin-top:0.75rem">
-    <button class="btn-exportar" onclick="exportarCSV()">⬇ Exportar CSV</button>
-  </div>
-
-  <div id="total-info" style="margin-top:0.5rem"></div>
-  <div id="loading-app" style="display:none"><div class="spinner"></div></div>
-  <div class="grid" id="grid"></div>
-</div>
+  <section id="app" hidden>
+    <div class="abas" id="abas" role="tablist"></div>
+    <div id="conteudo"></div>
+  </section>
+</main>
 
 <script>
-// ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
-const SIGAA_JSON      = '../dados/docentes-sigaa.json';
+(function () {
+  'use strict';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
+  var $ = function (id) { return document.getElementById(id); };
+  var senha = '';       // só em memória; recarregar a página exige entrar de novo
+  var dados = null;
+  var aba = 'aprovar';
 
-// ── ESTADO ────────────────────────────────────────────────────────────────────
-let senhaCorreta = null; // preenchida após login bem-sucedido
-let todosDisponiveis = [];
-let todosRecusaram   = [];
-let todosNC          = []; // não cadastrados
-let abaAtual         = 'disponiveis';
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function norm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function seguroHref(u) { try { var x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch (e) { return ''; } }
+  function dt(iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }); }
 
-// ── LOGIN ─────────────────────────────────────────────────────────────────────
-async function entrar() {
-  const senha = document.getElementById('senha-input').value.trim();
-  if (!senha) return;
+  function chamar(corpo) {
+    corpo.senha = senha;
+    return fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(corpo) }).then(function (r) { return r.json(); });
+  }
 
-  document.getElementById('erro-login').style.display = 'none';
+  $('login').addEventListener('submit', function (e) {
+    e.preventDefault();
+    senha = $('senha').value;
+    $('erro-login').textContent = '';
+    $('entrar').disabled = true;
+    carregar().then(function (ok) {
+      $('entrar').disabled = false;
+      if (ok) { $('senha').value = ''; $('login').hidden = true; $('app').hidden = false; $('sair').hidden = false; desenhar(); }
+      else senha = '';
+    });
+  });
+  $('sair').addEventListener('click', function () { senha = ''; dados = null; location.reload(); });
 
-  try {
-    const url = `${APPS_SCRIPT_URL}?acao=lista&senha=${encodeURIComponent(senha)}`;
-    const resp = await fetch(url);
-    const json = await resp.json();
+  function carregar() {
+    return chamar({ acao: 'painel' }).then(function (r) {
+      if (r.status !== 'ok') { $('erro-login').textContent = r.msg || 'Não foi possível entrar.'; if ($('app').hidden === false) alert(r.msg || 'Erro'); return false; }
+      dados = r; return true;
+    }).catch(function () { $('erro-login').textContent = 'Falha de conexão.'; return false; });
+  }
 
-    if (json.status === 'erro') {
-      document.getElementById('erro-login').textContent = json.msg || 'Senha incorreta.';
-      document.getElementById('erro-login').style.display = 'block';
-      return;
+  var ABAS = [
+    { id: 'aprovar', nome: 'Para aprovar', filtro: function (c) { return c.status === 'aguardando_ascom'; } },
+    { id: 'publicados', nome: 'Publicados', filtro: function (c) { return c.status === 'aprovado'; } },
+    { id: 'email', nome: 'Aguardando e-mail', filtro: function (c) { return c.status === 'aguardando_email'; } },
+    { id: 'recusas', nome: 'Não querem participar', filtro: function (c) { return c.status === 'recusou'; } },
+    { id: 'convite', nome: 'Ainda não responderam', filtro: null }
+  ];
+
+  function contar(a) {
+    if (a.id === 'convite') return dados.sigaa.filter(function (x) { return x.situacao === 'novo'; }).length;
+    return dados.cadastros.filter(a.filtro).length;
+  }
+
+  function desenhar() {
+    var bar = $('abas'); bar.textContent = '';
+    ABAS.forEach(function (a) {
+      var b = el('button', 'aba'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', a.id === aba ? 'true' : 'false');
+      b.appendChild(document.createTextNode(a.nome)); b.appendChild(el('span', 'n', '(' + contar(a) + ')'));
+      b.addEventListener('click', function () { aba = a.id; desenhar(); });
+      bar.appendChild(b);
+    });
+    var c = $('conteudo'); c.textContent = '';
+    if (aba === 'convite') return desenharConvite(c);
+    var def = ABAS.filter(function (a) { return a.id === aba; })[0];
+    var itens = dados.cadastros.filter(def.filtro).sort(function (a, b) { return a.criado_em < b.criado_em ? 1 : -1; });
+    if (!itens.length) { c.appendChild(el('div', 'caixa vazio', 'Nada por aqui.')); return; }
+    var l = el('div', 'lista');
+    itens.forEach(function (i) { l.appendChild(item(i)); });
+    c.appendChild(l);
+  }
+
+  function linha(rot, val) { var p = el('p', 'linha'); p.appendChild(el('b', null, rot + ': ')); p.appendChild(document.createTextNode(val || 'não informado')); return p; }
+
+  function item(i) {
+    var box = el('article', 'item');
+    var h = el('h3', null, i.nome); if (i.status === 'aprovado') h.appendChild(el('span', 'selo', 'publicado'));
+    box.appendChild(h);
+    box.appendChild(el('div', 'un', [i.unidade, i.campus, 'SIAPE ' + i.siape].filter(Boolean).join(' · ')));
+    if (i.status !== 'recusou') {
+      box.appendChild(linha('Apresentação', i.resumo));
+      box.appendChild(linha('Temas', i.temas));
+      box.appendChild(linha('Formatos', i.formatos));
+      box.appendChild(linha('Formação', (i.formacoes || []).map(function (f) { return f.nivel + ' em ' + f.curso + ' (' + f.instituicao + (f.ano ? ', ' + f.ano : '') + ')'; }).join('; ')));
+      var p = el('p', 'linha'); p.appendChild(el('b', null, 'E-mail (confira se combina com o nome): '));
+      p.appendChild(document.createTextNode(i.email || 'não informado')); box.appendChild(p);
+      box.appendChild(linha('WhatsApp', i.whatsapp));
+      var lh = seguroHref(i.lattes);
+      var pl = el('p', 'linha'); pl.appendChild(el('b', null, 'Lattes: '));
+      if (lh) { var a = el('a', null, lh); a.href = lh; a.target = '_blank'; a.rel = 'noopener noreferrer'; pl.appendChild(a); } else pl.appendChild(document.createTextNode('não informado'));
+      box.appendChild(pl);
+      if (i.observacao) box.appendChild(linha('Observação do docente', i.observacao));
     }
-
-    // Login OK
-    senhaCorreta = senha;
-    processarDados(json);
-
-  } catch (e) {
-    document.getElementById('erro-login').textContent = 'Erro ao conectar. Verifique a URL do Apps Script.';
-    document.getElementById('erro-login').style.display = 'block';
-  }
-}
-
-// ── PROCESSAR DADOS ───────────────────────────────────────────────────────────
-async function processarDados(json) {
-  document.getElementById('tela-login').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('loading-app').style.display = 'block';
-
-  const submissions = json.submissions || [];
-
-  // Separa disponíveis e recusaram
-  todosDisponiveis = submissions.filter(d => d.disponivel === 'Sim');
-  todosRecusaram   = submissions.filter(d => d.disponivel === 'Não');
-
-  // Carrega lista SIGAA para calcular não cadastrados
-  try {
-    const sigaaResp = await fetch(SIGAA_JSON + '?v=' + Date.now());
-    const sigaaJson = await sigaaResp.json();
-    const sigaa     = sigaaJson.docentes || [];
-
-    const siapesSubmetidos = new Set(submissions.map(d => String(d.siape).trim()));
-    todosNC = sigaa.filter(d => !siapesSubmetidos.has(String(d.siape).trim()));
-  } catch (e) {
-    todosNC = [];
+    box.appendChild(linha('Enviado em', dt(i.criado_em)));
+    var ac = el('div', 'acoes');
+    if (i.status === 'aguardando_ascom') {
+      ac.appendChild(botao('Aprovar e publicar', 'pri', function () { decidir(i, 'aprovar', 'Publicar o cartão de ' + i.nome + ' no site?'); }));
+      ac.appendChild(botao('Rejeitar', 'perigo', function () { decidir(i, 'rejeitar', 'Rejeitar o cadastro de ' + i.nome + '?'); }));
+    } else if (i.status === 'aprovado') {
+      ac.appendChild(botao('Retirar do site', 'perigo', function () { decidir(i, 'retirar', 'Retirar ' + i.nome + ' do site?'); }));
+    }
+    if (ac.childNodes.length) box.appendChild(ac);
+    return box;
   }
 
-  // Atualiza contadores
-  document.getElementById('cnt-disponiveis').textContent = todosDisponiveis.length;
-  document.getElementById('cnt-recusaram').textContent   = todosRecusaram.length;
-  document.getElementById('cnt-nc').textContent          = todosNC.length;
+  function botao(txt, cls, fn) { var b = el('button', 'btn ' + cls, txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
-  document.getElementById('loading-app').style.display = 'none';
-  filtrar();
-}
-
-// ── ABAS ──────────────────────────────────────────────────────────────────────
-function mudarAba(aba) {
-  abaAtual = aba;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + (aba === 'nao-cadastrados' ? 'nc' : aba)).classList.add('active');
-
-  // Mostra/oculta filtro campus (não se aplica a não-cadastrados)
-  document.getElementById('filtro-campus').style.display =
-    aba === 'nao-cadastrados' ? 'none' : '';
-
-  filtrar();
-}
-
-// ── FILTRO ────────────────────────────────────────────────────────────────────
-function filtrar() {
-  const busca  = document.getElementById('busca').value.toLowerCase();
-  const campus = document.getElementById('filtro-campus').value;
-
-  if (abaAtual === 'nao-cadastrados') {
-    const filtrados = todosNC.filter(d => {
-      const texto = `${d.nome} ${d.unidade} ${d.siape}`.toLowerCase();
-      return !busca || texto.includes(busca);
-    });
-    renderizarNC(filtrados);
-    return;
+  function decidir(i, decisao, pergunta) {
+    if (!confirm(pergunta)) return;
+    document.querySelectorAll('.acoes .btn').forEach(function (b) { b.disabled = true; });
+    chamar({ acao: 'moderar', id: i.id, decisao: decisao }).then(function (r) {
+      if (r.status !== 'ok') { alert(r.msg || 'Não foi possível concluir.'); }
+      return carregar();
+    }).then(function () { desenhar(); }).catch(function () { alert('Falha de conexão.'); desenhar(); });
   }
 
-  const lista = abaAtual === 'disponiveis' ? todosDisponiveis : todosRecusaram;
-
-  const filtrados = lista.filter(d => {
-    const texto = `${d.nome} ${d.unidade} ${d.temas || ''} ${d.resumo || ''}`.toLowerCase();
-    const matchBusca  = !busca  || texto.includes(busca);
-    const matchCampus = !campus || d.campus === campus;
-    return matchBusca && matchCampus;
-  });
-
-  renderizar(filtrados);
-}
-
-// ── RENDER: DISPONÍVEIS / RECUSARAM ──────────────────────────────────────────
-function renderizar(lista) {
-  const grid = document.getElementById('grid');
-  const info = document.getElementById('total-info');
-  grid.innerHTML = '';
-
-  if (lista.length === 0) {
-    grid.innerHTML = '<div class="empty">Nenhum resultado.</div>';
-    info.textContent = '';
-    return;
+  function desenharConvite(c) {
+    var lista = dados.sigaa.filter(function (x) { return x.situacao === 'novo'; });
+    var barra = el('div', 'barra');
+    var busca = el('input'); busca.type = 'search'; busca.placeholder = 'Filtrar por nome ou unidade'; busca.setAttribute('aria-label', 'Filtrar');
+    var exp = botao('Baixar lista (CSV)', '', function () { exportar(atuais); });
+    barra.appendChild(busca); barra.appendChild(exp); c.appendChild(barra);
+    c.appendChild(el('p', 'un', 'Docentes da lista do SIGAA que ainda não se cadastraram nem disseram que não querem participar. Use para decidir quem receber o convite.'));
+    var wrap = el('div', 'tabela-wrap'); c.appendChild(wrap);
+    var atuais = lista;
+    function mostrar() {
+      var q = norm(busca.value.trim());
+      atuais = lista.filter(function (x) { return !q || norm(x.nome + ' ' + x.unidade).indexOf(q) >= 0; });
+      wrap.textContent = '';
+      var t = el('table'); var th = el('thead'); var tr = el('tr');
+      ['Nome', 'SIAPE', 'Unidade'].forEach(function (x) { tr.appendChild(el('th', null, x)); }); th.appendChild(tr); t.appendChild(th);
+      var tb = el('tbody');
+      atuais.forEach(function (x) { var r = el('tr'); [x.nome, x.siape, x.unidade].forEach(function (v) { r.appendChild(el('td', null, v)); }); tb.appendChild(r); });
+      t.appendChild(tb); wrap.appendChild(t);
+      if (!atuais.length) wrap.appendChild(el('div', 'vazio', 'Nenhum docente nesta lista.'));
+    }
+    busca.addEventListener('input', mostrar); mostrar();
   }
 
-  info.textContent = `${lista.length} docente${lista.length !== 1 ? 's' : ''}`;
-
-  lista.forEach(d => {
-    const formacaoLabel = d.formacoes && d.formacoes.length
-      ? d.formacoes.map(f => `${f.nivel}${f.curso ? ' em ' + f.curso : ''}${f.instituicao ? ' — ' + f.instituicao : ''}${f.ano ? ' ('+f.ano+')' : ''}`).join('<br>')
-      : '';
-
-    const tagsHtml = d.temas
-      ? d.temas.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('')
-      : '';
-
-    const formatosHtml = d.formatos
-      ? `<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem">🎙 ${d.formatos}</div>`
-      : '';
-
-    const latteHtml = d.lattes
-      ? `<div style="font-size:0.78rem;margin-top:0.15rem"><a href="${d.lattes}" target="_blank" style="color:var(--verde)">Ver Lattes →</a></div>`
-      : '';
-
-    const contatoHtml = (d.email || d.whatsapp) ? `
-      <div class="contatos">
-        <h4>📋 Contatos internos</h4>
-        ${d.email    ? `<div class="contato-linha">✉️ <a href="mailto:${d.email}">${d.email}</a></div>` : ''}
-        ${d.whatsapp ? `<div class="contato-linha">📱 <a href="https://wa.me/55${d.whatsapp.replace(/\D/g,'')}" target="_blank">${d.whatsapp}</a></div>` : ''}
-      </div>` : '';
-
-    const obsHtml = d.observacao
-      ? `<div style="font-size:0.8rem;color:var(--muted);font-style:italic">💬 ${d.observacao}</div>`
-      : '';
-
-    const recusaBadge = d.disponivel === 'Não'
-      ? `<span class="badge-recusa">RECUSOU</span>`
-      : '';
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem">
-        <div class="card-nome">${d.nome}</div>
-        ${recusaBadge}
-      </div>
-      <div class="card-unidade">${d.unidade}</div>
-      ${d.siape ? `<div class="card-siape">SIAPE: ${d.siape}</div>` : ''}
-      ${d.campus ? `<div class="card-campus">📍 ${d.campus}</div>` : ''}
-      ${formacaoLabel ? `<div class="card-formacao" style="line-height:1.6">🎓 ${formacaoLabel}</div>` : ''}
-      ${d.resumo ? `<div class="card-resumo">${d.resumo}</div>` : ''}
-      ${tagsHtml ? `<div class="tags">${tagsHtml}</div>` : ''}
-      ${formatosHtml}
-      ${latteHtml}
-      ${contatoHtml}
-      ${obsHtml}
-    `;
-    grid.appendChild(card);
-  });
-}
-
-// ── RENDER: NÃO CADASTRADOS ───────────────────────────────────────────────────
-function renderizarNC(lista) {
-  const grid = document.getElementById('grid');
-  const info = document.getElementById('total-info');
-  grid.innerHTML = '';
-
-  if (lista.length === 0) {
-    grid.innerHTML = '<div class="empty">Todos os docentes já se cadastraram! 🎉</div>';
-    info.textContent = '';
-    return;
+  function exportar(lista) {
+    function cel(v) { v = String(v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
+    var linhas = ['nome,siape,unidade'].concat(lista.map(function (x) { return [x.nome, x.siape, x.unidade].map(cel).join(','); }));
+    var blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'docentes-sem-resposta.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   }
-
-  info.textContent = `${lista.length} docente${lista.length !== 1 ? 's' : ''} ainda não ${lista.length !== 1 ? 'se cadastraram' : 'se cadastrou'}`;
-
-  // Agrupa por unidade
-  const porUnidade = {};
-  lista.forEach(d => {
-    const u = d.unidade || 'Sem unidade';
-    if (!porUnidade[u]) porUnidade[u] = [];
-    porUnidade[u].push(d);
-  });
-
-  Object.entries(porUnidade).sort((a,b) => a[0].localeCompare(b[0])).forEach(([unidade, docentes]) => {
-    const bloco = document.createElement('div');
-    bloco.style.cssText = 'grid-column: 1 / -1; margin-top: 0.5rem;';
-    bloco.innerHTML = `<h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);border-bottom:1.5px solid var(--borda);padding-bottom:0.4rem;margin-bottom:0.75rem">${unidade} <span style="font-weight:400">(${docentes.length})</span></h3>`;
-    grid.appendChild(bloco);
-
-    const subgrid = document.createElement('div');
-    subgrid.style.cssText = 'grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;';
-    docentes.forEach(d => {
-      const card = document.createElement('div');
-      card.className = 'card-nc';
-      card.innerHTML = `
-        <div class="card-nc-nome">${d.nome}</div>
-        <div class="card-nc-info">SIAPE ${d.siape}</div>
-      `;
-      subgrid.appendChild(card);
-    });
-    grid.appendChild(subgrid);
-  });
-}
-
-// ── EXPORTAR CSV ──────────────────────────────────────────────────────────────
-function exportarCSV() {
-  let dados, cabecalho;
-
-  if (abaAtual === 'nao-cadastrados') {
-    cabecalho = ['SIAPE','Nome','Unidade'];
-    dados = todosNC.map(d => [d.siape, d.nome, d.unidade]);
-  } else {
-    const lista = abaAtual === 'disponiveis' ? todosDisponiveis : todosRecusaram;
-    cabecalho = ['SIAPE','Nome','Unidade','Campus','Disponível','Temas','Formatos','Email','WhatsApp','Lattes'];
-    dados = lista.map(d => [
-      d.siape, d.nome, d.unidade, d.campus || '', d.disponivel,
-      d.temas || '', d.formatos || '', d.email || '', d.whatsapp || '', d.lattes || ''
-    ]);
-  }
-
-  const linhas = [cabecalho, ...dados].map(row =>
-    row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
-  ).join('\n');
-
-  const blob = new Blob(['﻿' + linhas], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `banco-fontes-${abaAtual}-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-}
-
-// ── SAIR ──────────────────────────────────────────────────────────────────────
-function sair() {
-  senhaCorreta = null;
-  todosDisponiveis = todosRecusaram = todosNC = [];
-  document.getElementById('senha-input').value = '';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('tela-login').style.display = 'flex';
-}
+})();
 </script>
 </body>
 </html>
