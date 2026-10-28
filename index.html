@@ -58,7 +58,7 @@
   .btn-limpar { border: 1px solid var(--borda); background: var(--bg); padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
   .btn-limpar:hover { border-color: var(--verde); }
 
-  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; align-items: start; }
+  .grade { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
   .cartao { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 12px; }
   .cab { display: flex; gap: 14px; align-items: flex-start; }
   .avatar { flex: none; width: 56px; height: 56px; border-radius: 10px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.15rem; }
@@ -75,6 +75,17 @@
   .btn-lattes:hover { border-color: var(--verde); }
   .btn-solicitar { flex: 1; border: 0; background: var(--verde); color: #fff; padding: 11px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; }
   .btn-solicitar:hover { background: var(--verde-escuro); }
+
+  /* Lista em linhas: cada cartão ocupa a largura toda e organiza o conteúdo em três blocos */
+  @media (min-width: 900px) {
+    .cartao { display: grid; grid-template-columns: 290px minmax(0, 1fr) 190px; grid-template-rows: auto auto auto; column-gap: 28px; row-gap: 10px; align-items: start; min-height: 190px; }
+    .cartao .cab { grid-column: 1; grid-row: 1 / span 3; }
+    .cartao .resumo { grid-column: 2; grid-row: 1; }
+    .cartao .tags { grid-column: 2; grid-row: 2; }
+    .cartao .atende { grid-column: 2; grid-row: 3; }
+    .cartao .acoes { grid-column: 3; grid-row: 1 / span 3; align-self: center; flex-direction: column; }
+    .cartao .acoes .btn-solicitar { flex: none; }
+  }
 
   .vazio { grid-column: 1 / -1; background: var(--card); border-radius: 12px; padding: 28px; box-shadow: var(--sombra); text-align: center; }
   .vazio h3 { font-size: 1.1rem; margin-bottom: 6px; }
