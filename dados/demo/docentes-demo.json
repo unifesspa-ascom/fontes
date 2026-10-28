@@ -1,0 +1,1030 @@
+{
+  "ficticio": true,
+  "aviso": "DADOS FICTÍCIOS para demonstração e testes. Nomes, perfis e formações foram inventados e não descrevem docentes da Unifesspa.",
+  "total": 30,
+  "gerado_em": "2026-10-28T17:38:38.174140Z",
+  "docentes": [
+    {
+      "id": "demo-01",
+      "ficticio": true,
+      "nome": "Helena Maria Corvello Ribas",
+      "unidade": "Unidade de demonstração: Saúde",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Epidemiologia de doenças transmitidas por mosquitos na Amazônia, com foco em dengue, malária e febre amarela. Analisa a relação entre chuvas, desmatamento e casos notificados e orienta municípios sobre vigilância e prevenção.",
+      "temas": [
+        "dengue",
+        "malária",
+        "vigilância epidemiológica",
+        "saúde pública"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Saúde Coletiva",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2014"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Epidemiologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2009"
+        }
+      ]
+    },
+    {
+      "id": "demo-02",
+      "ficticio": true,
+      "nome": "Otávio Benedito Lanzoni",
+      "unidade": "Unidade de demonstração: Saúde",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Pesquisa o acesso aos serviços de saúde em municípios do sul e sudeste do Pará, com atenção à atenção primária, ao saneamento básico e à qualidade da água de abastecimento.",
+      "temas": [
+        "atenção primária",
+        "saneamento",
+        "água potável",
+        "saúde pública"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Saúde Coletiva",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2017"
+        },
+        {
+          "nivel": "Especialização",
+          "curso": "Gestão em Saúde",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        }
+      ]
+    },
+    {
+      "id": "demo-03",
+      "ficticio": true,
+      "nome": "Rosimeire Tavares Bandeira",
+      "unidade": "Unidade de demonstração: Saúde",
+      "campus": "Xinguara",
+      "resumo": "Atua em nutrição e segurança alimentar de comunidades rurais, estudando alimentação escolar, hortas comunitárias e o consumo de alimentos regionais como castanha e açaí.",
+      "temas": [
+        "segurança alimentar",
+        "nutrição",
+        "alimentação escolar",
+        "agricultura familiar"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Nutrição",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2012"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Nutrição",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2007"
+        }
+      ]
+    },
+    {
+      "id": "demo-04",
+      "ficticio": true,
+      "nome": "Gilberto Aurélio Sampaio Neto",
+      "unidade": "Unidade de demonstração: Saúde",
+      "campus": "Canaã dos Carajás",
+      "resumo": "Estuda a saúde do trabalhador em atividades de mineração e construção, incluindo doenças respiratórias, ruído e acidentes, e propõe medidas de prevenção para empresas e sindicatos.",
+      "temas": [
+        "saúde do trabalhador",
+        "doenças respiratórias",
+        "acidentes de trabalho",
+        "mineração"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Saúde Coletiva",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2016"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Fisioterapia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    },
+    {
+      "id": "demo-05",
+      "ficticio": true,
+      "nome": "Marlene Cristina Duarte Ferraz",
+      "unidade": "Unidade de demonstração: Educação",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Pesquisa o ensino de matemática nos anos finais do ensino fundamental, formação de professores e o uso de jogos e materiais concretos para reduzir a evasão escolar.",
+      "temas": [
+        "ensino de matemática",
+        "formação de professores",
+        "evasão escolar",
+        "educação básica"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Educação Matemática",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2013"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Educação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    },
+    {
+      "id": "demo-06",
+      "ficticio": true,
+      "nome": "Wellington Augusto Peixoto Leal",
+      "unidade": "Unidade de demonstração: Educação",
+      "campus": "Rondon do Pará",
+      "resumo": "Estuda a educação do campo e as escolas rurais da região, em especial a pedagogia da alternância, o transporte escolar e a permanência de jovens do campo no ensino médio.",
+      "temas": [
+        "educação do campo",
+        "pedagogia da alternância",
+        "escolas rurais",
+        "juventude rural"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Educação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Pedagogia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2009"
+        }
+      ]
+    },
+    {
+      "id": "demo-07",
+      "ficticio": true,
+      "nome": "Íris Valentina Quaresma Dória",
+      "unidade": "Unidade de demonstração: Educação",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Investiga a alfabetização e o letramento de crianças, o desempenho em leitura e as políticas públicas de educação infantil, com apoio a redes municipais de ensino.",
+      "temas": [
+        "alfabetização",
+        "letramento",
+        "educação infantil",
+        "políticas educacionais"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Educação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2018"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Pedagogia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2006"
+        }
+      ]
+    },
+    {
+      "id": "demo-08",
+      "ficticio": true,
+      "nome": "Cláudio Henrique Mourão Santiago",
+      "unidade": "Unidade de demonstração: Educação",
+      "campus": "São Félix do Xingu",
+      "resumo": "Trabalha com educação escolar indígena e interculturalidade, formação de professores indígenas e valorização das línguas e dos saberes tradicionais nas escolas.",
+      "temas": [
+        "educação indígena",
+        "interculturalidade",
+        "línguas indígenas",
+        "formação de professores"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Educação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2013"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Letras",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2007"
+        }
+      ]
+    },
+    {
+      "id": "demo-09",
+      "ficticio": true,
+      "nome": "Teodoro Alencar Brandão Filho",
+      "unidade": "Unidade de demonstração: Geociências",
+      "campus": "Canaã dos Carajás",
+      "resumo": "Pesquisa a geologia de depósitos de cobre e ouro da província mineral de Carajás, métodos de prospecção e a caracterização de rochas e minérios.",
+      "temas": [
+        "geologia",
+        "mineração",
+        "cobre",
+        "prospecção mineral"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Geologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2012"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Geologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2005"
+        }
+      ]
+    },
+    {
+      "id": "demo-10",
+      "ficticio": true,
+      "nome": "Verônica Sales Camargo Prado",
+      "unidade": "Unidade de demonstração: Geociências",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Estuda os impactos ambientais da mineração, como rejeitos, barragens e contaminação de rios por metais, e a recuperação de áreas degradadas.",
+      "temas": [
+        "impactos da mineração",
+        "barragens de rejeito",
+        "recuperação de áreas degradadas",
+        "metais pesados"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Engenharia Ambiental",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Geoquímica",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2010"
+        }
+      ]
+    },
+    {
+      "id": "demo-11",
+      "ficticio": true,
+      "nome": "Anselmo Rufino Cavalcante Lyra",
+      "unidade": "Unidade de demonstração: Engenharia",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Atua em engenharia de minas, estabilidade de taludes e segurança em lavra a céu aberto, além do aproveitamento de resíduos da mineração na construção civil.",
+      "temas": [
+        "engenharia de minas",
+        "estabilidade de taludes",
+        "resíduos de mineração",
+        "construção civil"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Engenharia Mineral",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Engenharia de Minas",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2004"
+        }
+      ]
+    },
+    {
+      "id": "demo-12",
+      "ficticio": true,
+      "nome": "Débora Letícia Nogueira Aragão",
+      "unidade": "Unidade de demonstração: Ciências Sociais",
+      "campus": "Canaã dos Carajás",
+      "resumo": "Analisa os efeitos sociais da expansão mineral sobre cidades da região, como migração, habitação, preços de aluguel e a economia local dependente de grandes empreendimentos.",
+      "temas": [
+        "expansão mineral",
+        "desenvolvimento regional",
+        "migração",
+        "economia local"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Sociologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2016"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Desenvolvimento Regional",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        }
+      ]
+    },
+    {
+      "id": "demo-13",
+      "ficticio": true,
+      "nome": "Ernesto Vilela Magalhães Couto",
+      "unidade": "Unidade de demonstração: Agrárias",
+      "campus": "Xinguara",
+      "resumo": "Pesquisa a pecuária de corte na Amazônia, o manejo de pastagens degradadas, a recuperação de pasto e sistemas que integram lavoura, pecuária e floresta.",
+      "temas": [
+        "pecuária",
+        "pastagens",
+        "integração lavoura-pecuária-floresta",
+        "manejo de solo"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Zootecnia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2014"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Agronomia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2006"
+        }
+      ]
+    },
+    {
+      "id": "demo-14",
+      "ficticio": true,
+      "nome": "Luzia Aparecida Freire Montenegro",
+      "unidade": "Unidade de demonstração: Agrárias",
+      "campus": "Santana do Araguaia",
+      "resumo": "Estuda a pesca artesanal nos rios Araguaia e Tocantins, o manejo de pescado, o período de defeso e a renda de comunidades ribeirinhas.",
+      "temas": [
+        "pesca artesanal",
+        "defeso",
+        "pescado",
+        "comunidades ribeirinhas"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Recursos Pesqueiros",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2013"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Aquicultura",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    },
+    {
+      "id": "demo-15",
+      "ficticio": true,
+      "nome": "Joaquim Nunes Bittencourt Reis",
+      "unidade": "Unidade de demonstração: Agrárias",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Trabalha com piscicultura em tanques escavados, nutrição de espécies nativas, qualidade da água de cultivo e viabilidade econômica de pequenos produtores.",
+      "temas": [
+        "piscicultura",
+        "aquicultura",
+        "tambaqui",
+        "qualidade da água"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Aquicultura",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2016"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Engenharia de Pesca",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2010"
+        }
+      ]
+    },
+    {
+      "id": "demo-16",
+      "ficticio": true,
+      "nome": "Sônia Regina Amaral Villas Boas",
+      "unidade": "Unidade de demonstração: Agrárias",
+      "campus": "Rondon do Pará",
+      "resumo": "Pesquisa agroecologia e sistemas agroflorestais com cacau, açaí e cupuaçu, o uso de adubação orgânica e a comercialização da agricultura familiar.",
+      "temas": [
+        "agroecologia",
+        "sistemas agroflorestais",
+        "cacau",
+        "agricultura familiar"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Agronomia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Agroecologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2010"
+        }
+      ]
+    },
+    {
+      "id": "demo-17",
+      "ficticio": true,
+      "nome": "Fabrício Gaspar Leão Medeiros",
+      "unidade": "Unidade de demonstração: Direito",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Estuda conflitos agrários, regularização fundiária e violência no campo no sul e sudeste do Pará, com atuação junto a movimentos sociais e defensorias.",
+      "temas": [
+        "conflitos agrários",
+        "regularização fundiária",
+        "direitos humanos",
+        "violência no campo"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Direito",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2017"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Direito Agrário",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        }
+      ]
+    },
+    {
+      "id": "demo-18",
+      "ficticio": true,
+      "nome": "Nathália Rocha Siqueira Jardim",
+      "unidade": "Unidade de demonstração: Ciências Sociais",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Pesquisa povos e comunidades tradicionais, territórios quilombolas e consulta prévia, livre e informada, com ênfase em direitos territoriais e memória.",
+      "temas": [
+        "quilombolas",
+        "comunidades tradicionais",
+        "consulta prévia",
+        "direitos territoriais"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Antropologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2018"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Ciências Sociais",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2010"
+        }
+      ]
+    },
+    {
+      "id": "demo-19",
+      "ficticio": true,
+      "nome": "Raimundo Délio Cordeiro Pessoa",
+      "unidade": "Unidade de demonstração: Ciências Sociais",
+      "campus": "São Félix do Xingu",
+      "resumo": "Investiga a história da ocupação da Amazônia, migrações e a formação das cidades do sudeste do Pará, com uso de arquivos, relatos orais e cartografia histórica.",
+      "temas": [
+        "história regional",
+        "migrações",
+        "história oral",
+        "ocupação da Amazônia"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "História",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2012"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "História Social",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2007"
+        }
+      ]
+    },
+    {
+      "id": "demo-20",
+      "ficticio": true,
+      "nome": "Camila Esperança Tostes Lobão",
+      "unidade": "Unidade de demonstração: Direito",
+      "campus": "Canaã dos Carajás",
+      "resumo": "Atua em direito ambiental e licenciamento, responsabilidade por danos ambientais e participação social em audiências públicas de grandes empreendimentos.",
+      "temas": [
+        "direito ambiental",
+        "licenciamento ambiental",
+        "danos ambientais",
+        "participação social"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Direito Ambiental",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2014"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Direito",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    },
+    {
+      "id": "demo-21",
+      "ficticio": true,
+      "nome": "Leandro Pimentel Borges Guedes",
+      "unidade": "Unidade de demonstração: Computação",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Pesquisa aprendizagem de máquina e processamento de linguagem natural, com aplicações em textos públicos, e discute vieses e limites de sistemas de inteligência artificial.",
+      "temas": [
+        "inteligência artificial",
+        "aprendizagem de máquina",
+        "processamento de linguagem natural",
+        "ética em dados"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Ciência da Computação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2016"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Informática",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        }
+      ]
+    },
+    {
+      "id": "demo-22",
+      "ficticio": true,
+      "nome": "Priscila Andrade Moreira Colares",
+      "unidade": "Unidade de demonstração: Computação",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Atua em engenharia de software e sistemas de informação para o setor público, testes de software, acessibilidade e desenvolvimento de aplicações web.",
+      "temas": [
+        "engenharia de software",
+        "acessibilidade",
+        "sistemas web",
+        "testes de software"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Ciência da Computação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Sistemas de Informação",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2009"
+        }
+      ]
+    },
+    {
+      "id": "demo-23",
+      "ficticio": true,
+      "nome": "Heitor Gonçalves Vasconcelos Dantas",
+      "unidade": "Unidade de demonstração: Matemática e Estatística",
+      "campus": "Xinguara",
+      "resumo": "Trabalha com estatística aplicada e análise de dados, séries temporais de chuva e temperatura, visualização de dados e comunicação de números para o público leigo.",
+      "temas": [
+        "estatística",
+        "análise de dados",
+        "visualização de dados",
+        "séries temporais"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Estatística",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2017"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Matemática",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2009"
+        }
+      ]
+    },
+    {
+      "id": "demo-24",
+      "ficticio": true,
+      "nome": "Adriana Pacheco Lemos Tenório",
+      "unidade": "Unidade de demonstração: Engenharia",
+      "campus": "Santana do Araguaia",
+      "resumo": "Pesquisa recursos hídricos, hidrologia de bacias amazônicas, cheias e secas do rio Araguaia e o planejamento do uso da água em cidades pequenas.",
+      "temas": [
+        "recursos hídricos",
+        "hidrologia",
+        "cheias e secas",
+        "bacias hidrográficas"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Engenharia Civil",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2013"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Recursos Hídricos",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    },
+    {
+      "id": "demo-25",
+      "ficticio": true,
+      "nome": "Bernardo Cássio Wanderley Pinto",
+      "unidade": "Unidade de demonstração: Engenharia",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Estuda energia solar fotovoltaica e eficiência energética em prédios públicos, além de microrredes para comunidades isoladas sem acesso regular à eletricidade.",
+      "temas": [
+        "energia solar",
+        "eficiência energética",
+        "microrredes",
+        "energias renováveis"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Engenharia Elétrica",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Engenharia Elétrica",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2007"
+        }
+      ]
+    },
+    {
+      "id": "demo-26",
+      "ficticio": true,
+      "nome": "Ivone Maria Santarém Falcão",
+      "unidade": "Unidade de demonstração: Engenharia",
+      "campus": "Canaã dos Carajás",
+      "resumo": "Atua em engenharia civil e materiais de construção, uso de resíduos em concreto, patologias de edificações e habitação de interesse social.",
+      "temas": [
+        "materiais de construção",
+        "concreto",
+        "habitação de interesse social",
+        "engenharia civil"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Engenharia Civil",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2012"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Engenharia Civil",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2006"
+        }
+      ]
+    },
+    {
+      "id": "demo-27",
+      "ficticio": true,
+      "nome": "Cecília Marques Albuquerque Seixas",
+      "unidade": "Unidade de demonstração: Biologia",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Pesquisa a biodiversidade de florestas e savanas do sudeste do Pará, aves e mamíferos, e os efeitos da fragmentação do habitat sobre a fauna.",
+      "temas": [
+        "biodiversidade",
+        "fauna",
+        "fragmentação florestal",
+        "conservação"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Ecologia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2014"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Ciências Biológicas",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2007"
+        }
+      ]
+    },
+    {
+      "id": "demo-28",
+      "ficticio": true,
+      "nome": "Maurício Evangelista Tolentino Cruz",
+      "unidade": "Unidade de demonstração: Biologia",
+      "campus": "Rondon do Pará",
+      "resumo": "Estuda queimadas, incêndios florestais e mudanças climáticas na Amazônia, o monitoramento por satélite do desmatamento e a restauração de florestas.",
+      "temas": [
+        "queimadas",
+        "mudanças climáticas",
+        "desmatamento",
+        "restauração florestal"
+      ],
+      "formatos": [
+        "Presencial",
+        "TV ou vídeo",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Ciências Ambientais",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2016"
+        },
+        {
+          "nivel": "Mestrado",
+          "curso": "Ciências Florestais",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2011"
+        }
+      ]
+    },
+    {
+      "id": "demo-29",
+      "ficticio": true,
+      "nome": "Aline Beatriz Fontenele Cordovil",
+      "unidade": "Unidade de demonstração: Biologia",
+      "campus": "São Félix do Xingu",
+      "resumo": "Pesquisa plantas medicinais e saberes de comunidades locais, a conservação de espécies nativas e o cultivo de ervas e frutíferas em quintais agroflorestais.",
+      "temas": [
+        "plantas medicinais",
+        "etnobotânica",
+        "espécies nativas",
+        "quintais agroflorestais"
+      ],
+      "formatos": [
+        "Presencial",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Botânica",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2015"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Ciências Biológicas",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2010"
+        }
+      ]
+    },
+    {
+      "id": "demo-30",
+      "ficticio": true,
+      "nome": "Estela Maris Quintanilha Brito",
+      "unidade": "Unidade de demonstração: Ciências Sociais",
+      "campus": "Xinguara",
+      "resumo": "Estuda a economia regional, o mercado de trabalho e o comércio em cidades do interior do Pará, o microcrédito e o empreendedorismo de mulheres e jovens.",
+      "temas": [
+        "economia regional",
+        "mercado de trabalho",
+        "microcrédito",
+        "empreendedorismo"
+      ],
+      "formatos": [
+        "Presencial",
+        "Rádio ou áudio",
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Mestrado",
+          "curso": "Economia",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2014"
+        },
+        {
+          "nivel": "Graduação",
+          "curso": "Ciências Econômicas",
+          "instituicao": "Instituição de demonstração",
+          "ano": "2008"
+        }
+      ]
+    }
+  ]
+}
