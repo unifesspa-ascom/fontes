@@ -6,4 +6,4 @@
 - `figuras/`: gráficos gerados pelo caderno.
 - `tabela_grupos.csv`, `tabela_sensibilidade.csv`, `perfis_por_grupo.csv`: tabelas geradas pelo caderno.
 
-Resultado principal: com 9 grupos, o índice de silhueta foi 0,116 (abaixo de 0,25, estrutura fraca). A comparação com as áreas inventadas deu índice de Rand ajustado de 0,48. A análise deve ser refeita com os cadastros reais.
+Resultado principal: com 9 grupos, o índice de silhueta foi 0,116 (abaixo de 0,25, sem estrutura substancial). A comparação com as áreas inventadas deu índice de Rand ajustado de 0,48. A análise deve ser refeita com os cadastros reais.
