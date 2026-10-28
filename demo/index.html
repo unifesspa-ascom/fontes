@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEMONSTRAÇÃO | Banco de fontes | ASCOM Unifesspa</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Versão de demonstração do Banco de fontes, com dados fictícios.">
+<style>
+  :root {
+    --bg: #edefec;
+    --card: #fffffc;
+    --texto: #1f2a24;
+    --muted: #5d6a63;
+    --borda: #cfd6d1;
+    --verde: #14763c;
+    --verde-escuro: #0e5a2d;
+    --tag-bg: #e2f4e7;
+    --tag-cor: #14763c;
+    --sombra: 0 1px 3px rgba(20,40,28,.12), 0 6px 18px rgba(20,40,28,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101512; --card: #18201b; --texto: #e6ece8; --muted: #9fada5;
+      --borda: #2f3b34; --verde: #4fbf79; --verde-escuro: #3aa563;
+      --tag-bg: #1d3626; --tag-cor: #8be0a8; --sombra: 0 1px 3px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; background: var(--bg); color: var(--texto); line-height: 1.45; }
+  a { color: inherit; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid #f5c518; outline-offset: 2px; }
+
+  .topo { background: var(--card); border-bottom: 1px solid var(--borda); }
+  .topo-in { max-width: 1200px; margin: 0 auto; padding: 18px 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .logo img { height: 52px; display: block; }
+  .logo-texto { font-weight: 800; font-size: 1.5rem; letter-spacing: -.5px; color: var(--verde); white-space: nowrap; }
+  .logo-texto span { font-weight: 300; color: var(--muted); margin: 0 6px; }
+  .titulo { flex: 1; min-width: 220px; }
+  .titulo h1 { font-size: 1.35rem; line-height: 1.2; }
+  .titulo p { color: var(--muted); font-size: .95rem; margin-top: 2px; }
+  .btn-participar { text-decoration: none; border: 1px solid var(--borda); background: var(--card); padding: 12px 18px; border-radius: 10px; font-weight: 600; box-shadow: var(--sombra); }
+  .btn-participar:hover { border-color: var(--verde); color: var(--verde); }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 16px 20px 40px; }
+  .busca { background: var(--card); border-radius: 12px; padding: 22px; box-shadow: var(--sombra); margin-bottom: 20px; }
+  .busca h2 { font-size: 1.15rem; }
+  .busca .ajuda { color: var(--muted); font-size: .92rem; margin: 2px 0 14px; }
+  .campos { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+  .campos input, .campos select { width: 100%; padding: 12px 14px; border: 1px solid var(--borda); border-radius: 8px; background: var(--card); min-height: 46px; }
+  .campos input:focus, .campos select:focus { border-color: var(--verde); }
+  .temas { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+  .temas[hidden] { display: none; }
+  .temas strong { font-size: .9rem; color: var(--muted); margin-right: 4px; }
+  .chip { border: 1px solid var(--borda); background: var(--bg); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-size: .92rem; }
+  .chip:hover, .chip[aria-pressed="true"] { border-color: var(--verde); background: var(--tag-bg); color: var(--tag-cor); }
+  .linha-info { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; color: var(--muted); font-size: .92rem; }
+  .btn-limpar { border: 1px solid var(--borda); background: var(--bg); padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  .btn-limpar:hover { border-color: var(--verde); }
+
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; align-items: start; }
+  .cartao { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 12px; }
+  .cab { display: flex; gap: 14px; align-items: flex-start; }
+  .avatar { flex: none; width: 56px; height: 56px; border-radius: 10px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.15rem; }
+  .cab h3 { font-size: 1.1rem; line-height: 1.2; }
+  .cab .titulacao { color: var(--verde); font-weight: 700; font-size: .95rem; margin-top: 3px; }
+  .cab .unidade { color: var(--muted); font-size: .87rem; margin-top: 3px; }
+  .resumo { font-size: .96rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: var(--tag-bg); color: var(--tag-cor); padding: 5px 12px; border-radius: 999px; font-size: .88rem; font-weight: 600; border: 0; cursor: pointer; }
+  .tag:hover { filter: brightness(.95); }
+  .atende { color: var(--muted); font-size: .87rem; }
+  .acoes { display: flex; gap: 10px; margin-top: 2px; }
+  .btn-lattes { text-decoration: none; display: inline-grid; place-items: center; padding: 11px 16px; border: 1px solid var(--borda); border-radius: 8px; font-weight: 600; background: var(--card); }
+  .btn-lattes:hover { border-color: var(--verde); }
+  .btn-solicitar { flex: 1; border: 0; background: var(--verde); color: #fff; padding: 11px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+  .btn-solicitar:hover { background: var(--verde-escuro); }
+
+  .vazio { grid-column: 1 / -1; background: var(--card); border-radius: 12px; padding: 28px; box-shadow: var(--sombra); text-align: center; }
+  .vazio h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .vazio p { color: var(--muted); }
+  .vazio a { color: var(--verde); font-weight: 700; }
+
+  .rodape { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; color: var(--muted); font-size: .85rem; }
+
+  .fundo { position: fixed; inset: 0; background: rgba(10,20,14,.55); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  .fundo.aberto { display: flex; }
+  .modal { background: var(--card); border-radius: 12px; width: 100%; max-width: 540px; max-height: 92vh; overflow: auto; padding: 24px; position: relative; }
+  .modal h2 { font-size: 1.3rem; }
+  .modal .sub { color: var(--muted); font-size: .92rem; margin: 2px 28px 14px 0; }
+  .fechar { position: absolute; top: 12px; right: 14px; border: 0; background: none; font-size: 1.6rem; cursor: pointer; color: var(--muted); line-height: 1; padding: 4px 8px; }
+  .modal label { display: block; font-weight: 600; font-size: .9rem; margin: 12px 0 4px; }
+  .modal input, .modal select, .modal textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--borda); border-radius: 8px; background: var(--card); min-height: 44px; }
+  .modal textarea { min-height: 96px; resize: vertical; }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .previa { background: var(--bg); border-radius: 8px; padding: 12px 14px; margin-top: 16px; font-size: .9rem; }
+  .previa strong { display: block; margin-bottom: 6px; }
+  .previa pre { white-space: pre-wrap; word-break: break-word; font: inherit; max-height: 180px; overflow: auto; }
+  .erro-form { color: #b3261e; font-size: .88rem; margin-top: 10px; min-height: 1.2em; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .erro-form { color: #ffb4ab; } }
+  .modal-acoes { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .modal-acoes button { padding: 12px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; border: 1px solid var(--borda); background: var(--card); }
+  .modal-acoes .primario { background: var(--verde); color: #fff; border-color: var(--verde); flex: 1; }
+  .modal-acoes .primario:hover { background: var(--verde-escuro); }
+  .aviso-ok { color: var(--verde); font-weight: 600; font-size: .9rem; margin-top: 8px; min-height: 1.2em; }
+
+  @media (max-width: 760px) {
+    .campos { grid-template-columns: 1fr; }
+    .grade { grid-template-columns: 1fr; }
+    .duas { grid-template-columns: 1fr; }
+    .btn-participar { width: 100%; text-align: center; }
+  }
+  .faixa-demo { background: #7a1f1f; color: #fff; text-align: center; padding: 10px 16px; font-weight: 700; font-size: .95rem; }
+  .faixa-demo span { font-weight: 400; display: block; font-size: .85rem; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="faixa-demo" role="note">VERSÃO DE DEMONSTRAÇÃO: DADOS FICTÍCIOS<span>Os nomes e os perfis abaixo foram inventados para testes e não descrevem docentes da Unifesspa. Nenhum e-mail é enviado a partir desta página.</span></div>
+
+<header class="topo">
+  <div class="topo-in">
+    <a class="logo" href="../" aria-label="Unifesspa ASCOM">
+      <img src="../logo-unifesspa-ascom.png" alt="Unifesspa ASCOM" id="logo-img">
+    </a>
+    <div class="titulo">
+      <h1>Banco de fontes</h1>
+      <p>Docentes e pesquisadores da Unifesspa para entrevistas e análises</p>
+    </div>
+    <a class="btn-participar" href="../">Ir ao banco de fontes real</a>
+  </div>
+</header>
+
+<main>
+  <section class="busca" aria-labelledby="t-busca">
+    <h2 id="t-busca">Encontre uma fonte para a sua pauta</h2>
+    <p class="ajuda">Procure pelo assunto, como "dengue", "mineração" ou "inteligência artificial", ou pelo nome do especialista.</p>
+    <div class="campos">
+      <input type="search" id="q" placeholder="Assunto ou nome do especialista" autocomplete="off" aria-label="Assunto ou nome do especialista">
+      <select id="f-campus" aria-label="Campus"><option value="">Todos os campi</option></select>
+      <select id="f-formato" aria-label="Formato de atendimento">
+        <option value="">Qualquer formato</option>
+        <option>Presencial</option>
+        <option>TV ou vídeo</option>
+        <option>Rádio ou áudio</option>
+        <option>E-mail</option>
+      </select>
+    </div>
+    <div class="temas" id="temas" hidden><strong>Temas mais buscados:</strong></div>
+    <div class="linha-info">
+      <span id="contagem" aria-live="polite"></span>
+      <button type="button" class="btn-limpar" id="limpar">Limpar filtros</button>
+    </div>
+  </section>
+
+  <section class="grade" id="grade" aria-live="polite"></section>
+</main>
+
+<p class="rodape" id="rodape">Dados fictícios, criados para demonstração e testes do método. O contato é intermediado pela Assessoria de Comunicação (ASCOM) da Unifesspa.</p>
+
+<div class="fundo" id="fundo" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+  <div class="modal">
+    <button type="button" class="fechar" id="m-fechar" aria-label="Fechar">×</button>
+    <h2 id="m-titulo">Solicitar entrevista</h2>
+    <p class="sub" id="m-sub"></p>
+    <div class="duas">
+      <div><label for="m-nome">Seu nome</label><input id="m-nome" autocomplete="name"></div>
+      <div><label for="m-veiculo">Veículo</label><input id="m-veiculo"></div>
+    </div>
+    <div class="duas">
+      <div><label for="m-formato">Formato</label>
+        <select id="m-formato"><option>Presencial</option><option>TV ou vídeo</option><option>Rádio ou áudio</option><option>E-mail</option></select></div>
+      <div><label for="m-prazo">Prazo de resposta</label><input id="m-prazo" placeholder="Ex.: hoje até as 17h"></div>
+    </div>
+    <label for="m-pauta">Sobre o que é a pauta?</label>
+    <textarea id="m-pauta"></textarea>
+    <label for="m-tel">Seu telefone ou WhatsApp</label>
+    <input id="m-tel" type="tel" autocomplete="tel">
+    <div class="previa"><strong>Mensagem que será enviada à ASCOM</strong><pre id="m-previa"></pre></div>
+    <p class="erro-form" id="m-erro" role="alert"></p>
+    <div class="modal-acoes">
+      <button type="button" id="m-copiar">Copiar mensagem</button>
+      <button type="button" class="primario" id="m-enviar">Enviar por e-mail</button>
+    </div>
+    <p class="aviso-ok" id="m-ok" role="status"></p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var JSON_URL = '../dados/demo/docentes-demo.json';
+  var EMAIL_ASCOM = 'ascom@unifesspa.edu.br';
+  var CAMPI = ['Marabá (Campus Sede)', 'Canaã dos Carajás', 'Xinguara', 'Rondon do Pará', 'São Félix do Xingu', 'Santana do Araguaia'];
+  var NIVEIS = ['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado'];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var docentes = [];
+  var carregado = false;
+  var falhou = false;
+  var atual = null;
+  var identidade = { nome: '', veiculo: '', tel: '' };
+
+  function norm(s) {
+    return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  }
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  function lista(v) {
+    if (Array.isArray(v)) return v.map(String).map(function (x) { return x.trim(); }).filter(Boolean);
+    if (typeof v === 'string') return v.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+    return [];
+  }
+  function lattesValido(u) {
+    try {
+      var x = new URL(u);
+      return (x.protocol === 'https:' || x.protocol === 'http:') && /(^|\.)cnpq\.br$/i.test(x.hostname) ? x.href : '';
+    } catch (e) { return ''; }
+  }
+  function iniciais(nome) {
+    var p = String(nome).replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
+    if (!p.length) return '?';
+    return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+  }
+  function titulacao(d) {
+    var fs = Array.isArray(d.formacoes) ? d.formacoes : [];
+    var melhor = null, nivelMelhor = -1;
+    fs.forEach(function (f) {
+      var i = NIVEIS.indexOf(f && f.nivel);
+      if (i > nivelMelhor && f.curso) { nivelMelhor = i; melhor = f; }
+    });
+    if (!melhor || nivelMelhor < 1) return '';
+    return melhor.nivel + ' em ' + melhor.curso;
+  }
+  function dataBR(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  // Preparação dos dados
+  function preparar(d) {
+    var temas = lista(d.temas), formatos = lista(d.formatos);
+    var fs = Array.isArray(d.formacoes) ? d.formacoes : [];
+    return {
+      id: String(d.id || ''), nome: String(d.nome || ''), unidade: String(d.unidade || ''),
+      campus: String(d.campus || ''), resumo: String(d.resumo || ''),
+      temas: temas, formatos: formatos, formacoes: fs,
+      lattes: lattesValido(String(d.lattes || '')), titulo: titulacao(d),
+      busca: norm([d.nome, d.unidade, d.campus, d.resumo, temas.join(' '),
+        fs.map(function (f) { return (f && f.curso) || ''; }).join(' ')].join(' '))
+    };
+  }
+
+  function carregarCampi() {
+    var s = $('f-campus');
+    CAMPI.forEach(function (c) { var o = document.createElement('option'); o.textContent = c; s.appendChild(o); });
+  }
+
+  function temasMaisBuscados() {
+    var cont = {};
+    docentes.forEach(function (d) {
+      d.temas.forEach(function (t) { var k = norm(t); if (!cont[k]) cont[k] = { t: t, n: 0 }; cont[k].n++; });
+    });
+    var arr = Object.keys(cont).map(function (k) { return cont[k]; });
+    arr.sort(function (a, b) { return b.n - a.n || a.t.localeCompare(b.t, 'pt-BR'); });
+    return arr.slice(0, 8).map(function (x) { return x.t; });
+  }
+  function desenharTemas() {
+    var box = $('temas');
+    var ts = temasMaisBuscados();
+    box.querySelectorAll('.chip').forEach(function (c) { c.remove(); });
+    if (!ts.length) { box.hidden = true; return; }
+    box.hidden = false;
+    ts.forEach(function (t) {
+      var b = el('button', 'chip', t); b.type = 'button';
+      b.addEventListener('click', function () { $('q').value = t; filtrar(); });
+      box.appendChild(b);
+    });
+  }
+  function marcarChips() {
+    var q = norm($('q').value.trim());
+    $('temas').querySelectorAll('.chip').forEach(function (c) {
+      c.setAttribute('aria-pressed', norm(c.textContent) === q ? 'true' : 'false');
+    });
+  }
+
+  function cartao(d) {
+    var c = el('article', 'cartao');
+    var cab = el('div', 'cab');
+    cab.appendChild(el('div', 'avatar', iniciais(d.nome)));
+    var info = el('div');
+    info.appendChild(el('h3', null, d.nome));
+    if (d.titulo) info.appendChild(el('div', 'titulacao', d.titulo));
+    var un = [d.unidade, d.campus ? 'Campus ' + d.campus.replace(/ \(Campus Sede\)/, '') : ''].filter(Boolean).join(' · ');
+    if (un) info.appendChild(el('div', 'unidade', un));
+    cab.appendChild(info);
+    c.appendChild(cab);
+    if (d.resumo) c.appendChild(el('p', 'resumo', d.resumo));
+    if (d.temas.length) {
+      var tg = el('div', 'tags');
+      d.temas.forEach(function (t) {
+        var b = el('button', 'tag', t); b.type = 'button'; b.title = 'Buscar por ' + t;
+        b.addEventListener('click', function () { $('q').value = t; filtrar(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        tg.appendChild(b);
+      });
+      c.appendChild(tg);
+    }
+    if (d.formatos.length) c.appendChild(el('div', 'atende', 'Atende em: ' + d.formatos.join(', ')));
+    var ac = el('div', 'acoes');
+    if (d.lattes) {
+      var a = el('a', 'btn-lattes', 'Lattes'); a.href = d.lattes; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      ac.appendChild(a);
+    }
+    var s = el('button', 'btn-solicitar', 'Solicitar entrevista'); s.type = 'button';
+    s.addEventListener('click', function () { abrirModal(d); });
+    ac.appendChild(s);
+    c.appendChild(ac);
+    return c;
+  }
+
+  function vazio(semDados, filtrosAtivos) {
+    var v = el('div', 'vazio');
+    if (falhou) {
+      v.appendChild(el('h3', null, 'Não foi possível carregar a lista de fontes'));
+      v.appendChild(el('p', null, 'Atualize a página em instantes. Se o problema continuar, fale com a ASCOM.'));
+    } else if (semDados) {
+      v.appendChild(el('h3', null, 'O banco de fontes está sendo formado'));
+      v.appendChild(el('p', null, 'Ainda não há docentes publicados. Se precisa de uma fonte agora, fale com a ASCOM.'));
+    } else {
+      v.appendChild(el('h3', null, 'Nenhuma fonte encontrada para essa busca'));
+      v.appendChild(el('p', null, filtrosAtivos ? 'Tente outras palavras ou limpe os filtros de campus e formato. Se precisar de ajuda, fale com a ASCOM.' : 'Tente outras palavras. Se precisar de ajuda, fale com a ASCOM.'));
+    }
+    var p = el('p'); p.appendChild(document.createTextNode('A ASCOM indica uma fonte: '));
+    var a = el('a', null, EMAIL_ASCOM); a.href = 'mailto:' + EMAIL_ASCOM; p.appendChild(a);
+    v.appendChild(p);
+    return v;
+  }
+
+  function filtrar() {
+    var q = norm($('q').value.trim()), campus = $('f-campus').value, formato = $('f-formato').value;
+    var termos = q ? q.split(/\s+/) : [];
+    var res = docentes.filter(function (d) {
+      if (campus && d.campus !== campus) return false;
+      if (formato && d.formatos.indexOf(formato) < 0) return false;
+      return termos.every(function (t) { return d.busca.indexOf(t) >= 0; });
+    });
+    res.sort(function (a, b) { return a.nome.localeCompare(b.nome, 'pt-BR'); });
+    var g = $('grade'); g.textContent = '';
+    if (!carregado) return;
+    if (!res.length) {
+      g.appendChild(vazio(docentes.length === 0, !!(campus || formato)));
+    } else {
+      res.forEach(function (d) { g.appendChild(cartao(d)); });
+    }
+    var n = docentes.length;
+    $('contagem').textContent = n === 0 ? '' : res.length + ' de ' + n + (n === 1 ? ' especialista' : ' especialistas');
+    marcarChips();
+  }
+
+  function limpar() {
+    $('q').value = ''; $('f-campus').selectedIndex = 0; $('f-formato').selectedIndex = 0;
+    $('f-campus').value = ''; $('f-formato').value = '';
+    filtrar(); $('q').focus();
+  }
+
+  // Modal
+  function mensagem() {
+    var d = atual || {};
+    var un = d.unidade ? ' (' + d.unidade + ')' : '';
+    return 'Olá, ASCOM Unifesspa. Gostaria de solicitar uma entrevista com ' + d.nome + un + '.\n\n' +
+      'Jornalista: ' + ($('m-nome').value.trim() || '...') + '\n' +
+      'Veículo: ' + ($('m-veiculo').value.trim() || '...') + '\n' +
+      'Formato: ' + $('m-formato').value + '\n' +
+      'Prazo de resposta: ' + ($('m-prazo').value.trim() || '...') + '\n' +
+      'Telefone/WhatsApp: ' + ($('m-tel').value.trim() || '...') + '\n\n' +
+      'Pauta:\n' + ($('m-pauta').value.trim() || '...');
+  }
+  function atualizarPrevia() { $('m-previa').textContent = mensagem(); $('m-erro').textContent = ''; }
+  function abrirModal(d) {
+    atual = d;
+    $('m-sub').textContent = d.nome + ' · ' + (d.unidade || 'Unifesspa');
+    $('m-nome').value = identidade.nome; $('m-veiculo').value = identidade.veiculo; $('m-tel').value = identidade.tel;
+    $('m-prazo').value = ''; $('m-pauta').value = ''; $('m-formato').selectedIndex = 0;
+    $('m-erro').textContent = ''; $('m-ok').textContent = '';
+    atualizarPrevia();
+    $('fundo').classList.add('aberto');
+    $('m-nome').focus();
+  }
+  function fecharModal() { $('fundo').classList.remove('aberto'); atual = null; }
+  function validarModal() {
+    var falta = [];
+    if (!$('m-nome').value.trim()) falta.push('seu nome');
+    if (!$('m-veiculo').value.trim()) falta.push('o veículo');
+    if (!$('m-pauta').value.trim()) falta.push('a pauta');
+    if (falta.length) { $('m-erro').textContent = 'Preencha ' + falta.join(', ') + '.'; return false; }
+    $('m-erro').textContent = '';
+    identidade = { nome: $('m-nome').value.trim(), veiculo: $('m-veiculo').value.trim(), tel: $('m-tel').value.trim() };
+    return true;
+  }
+  function copiar() {
+    if (!validarModal()) return;
+    var t = mensagem();
+    var ok = function () { $('m-ok').textContent = 'Mensagem copiada. Cole no e-mail para ' + EMAIL_ASCOM + '.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(ok, function () { $('m-erro').textContent = 'Não foi possível copiar. Selecione o texto da prévia e copie.'; });
+    } else { $('m-erro').textContent = 'Seu navegador não permite copiar daqui. Selecione o texto da prévia e copie.'; }
+  }
+  function enviar() {
+    if (!validarModal()) return;
+    $('m-ok').textContent = 'Versão de demonstração: nenhum e-mail foi enviado, porque o perfil é fictício.';
+  }
+
+  // Inicialização
+  function logoFallback() {
+    var img = $('logo-img');
+    img.addEventListener('error', function () {
+      var t = el('div', 'logo-texto'); t.appendChild(document.createTextNode('UNIFESSPA'));
+      t.appendChild(el('span', null, '|')); t.appendChild(document.createTextNode('ASCOM'));
+      img.replaceWith(t);
+    });
+    if (img.complete && img.naturalWidth === 0) img.dispatchEvent(new Event('error'));
+  }
+  logoFallback();
+  carregarCampi();
+  ['m-nome', 'm-veiculo', 'm-formato', 'm-prazo', 'm-pauta', 'm-tel'].forEach(function (id) {
+    $(id).addEventListener('input', atualizarPrevia); $(id).addEventListener('change', atualizarPrevia);
+  });
+  $('q').addEventListener('input', filtrar);
+  $('f-campus').addEventListener('change', filtrar);
+  $('f-formato').addEventListener('change', filtrar);
+  $('limpar').addEventListener('click', limpar);
+  $('m-fechar').addEventListener('click', fecharModal);
+  $('m-copiar').addEventListener('click', copiar);
+  $('m-enviar').addEventListener('click', enviar);
+  $('fundo').addEventListener('click', function (e) { if (e.target === $('fundo')) fecharModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fecharModal(); });
+
+  fetch(JSON_URL + '?v=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function (j) {
+      docentes = (j.docentes || []).map(preparar);
+      var dt = dataBR(j.gerado_em);
+      if (dt) $('rodape').textContent += ' Atualizado em ' + dt + '.';
+      carregado = true; desenharTemas(); filtrar();
+    })
+    .catch(function () {
+      carregado = true; falhou = true; docentes = []; filtrar();
+    });
+})();
+</script>
+</body>
+</html>
