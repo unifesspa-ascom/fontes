@@ -230,6 +230,19 @@
     .campo-erro { border-color: var(--erro) !important; }
     .msg-erro { color: var(--erro); font-size: 0.78rem; margin-top: 0.25rem; display: none; }
 
+    /* Foto */
+    .foto-bloco { display: flex; gap: 1.1rem; align-items: flex-start; flex-wrap: wrap; }
+    .foto-caixa { width: 118px; height: 157px; border-radius: 8px; background: #e2f4e7; color: var(--verde); display: grid; place-items: center; font-weight: 800; font-size: 2rem; overflow: hidden; flex: none; border: 1.5px solid var(--borda); }
+    .foto-caixa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .foto-acoes { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; }
+    .btn-sec { padding: .5rem 1rem; border: 1.5px solid var(--borda); border-radius: 8px; background: var(--card); color: var(--texto); font-size: .875rem; font-weight: 600; cursor: pointer; }
+    .btn-sec:hover { border-color: var(--verde); color: var(--verde); }
+    .btn-sec[hidden] { display: none; }
+    .foto-nota { flex: 1; min-width: 200px; }
+    /* Autorização */
+    .autoriza { display: flex; gap: .65rem; align-items: flex-start; font-weight: 400; font-size: .92rem; cursor: pointer; padding: .75rem .9rem; border: 1.5px solid var(--borda); border-radius: 8px; }
+    .autoriza input { margin-top: .2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--verde); flex: none; }
+    .autoriza.campo-erro { border-color: var(--erro) !important; }
     #loading { display: none; text-align: center; padding: 1rem; color: var(--muted); }
     .spinner { display: inline-block; width: 20px; height: 20px;
       border: 3px solid var(--borda); border-top-color: var(--verde);
@@ -291,6 +304,21 @@
 
       <div class="card">
         <h2>4. Atuação e especialidade</h2>
+
+        <div class="field-group">
+          <label>Foto de apresentação</label>
+          <div class="foto-bloco">
+            <div class="foto-caixa" id="foto-caixa" aria-live="polite"></div>
+            <div class="foto-acoes">
+              <button type="button" class="btn-sec" id="foto-alterar">Alterar foto</button>
+              <button type="button" class="btn-sec" id="foto-sigaa" hidden>Usar a foto do SIGAA</button>
+              <button type="button" class="btn-sec" id="foto-remover">Remover foto</button>
+              <input type="file" id="foto-arquivo" accept="image/*" hidden>
+            </div>
+            <p class="hint foto-nota" id="foto-nota"></p>
+          </div>
+          <p class="msg-erro" id="erro-foto" role="alert"></p>
+        </div>
 
         <div class="field-group">
           <label for="campus">Campus <span class="req">*</span></label>
@@ -360,6 +388,15 @@
         </div>
       </div>
 
+      <div class="card">
+        <h2>7. Autorização</h2>
+        <label class="autoriza" id="rotulo-autorizo">
+          <input type="checkbox" id="autorizo">
+          <span>Autorizo a ASCOM da Unifesspa a divulgar no Banco de fontes (página pública) meu nome, unidade, formação, temas, mini-bio, link do Lattes e foto, para consulta de jornalistas. Entendo que meu e-mail e meu WhatsApp não são públicos e que posso pedir a retirada do cadastro a qualquer momento pelo e-mail ascom@unifesspa.edu.br. <span class="req" style="color:var(--erro)">*</span></span>
+        </label>
+        <p class="msg-erro" id="erro-autorizo" role="alert">Marque a autorização para enviar o cadastro.</p>
+      </div>
+
       <div class="isca" aria-hidden="true"><label>Não preencha <input type="text" id="site" tabindex="-1" autocomplete="off"></label></div>
       <p class="msg-erro" id="erro-envio" role="alert" style="margin-bottom:.75rem"></p>
       <div id="loading"><span class="spinner"></span> Enviando...</div>
@@ -395,6 +432,8 @@ const DOMINIO_EMAIL = '@unifesspa.edu.br';
 let docenteAtual = null;
 let tags = [];
 let formacaoCount = 0;
+// Foto: 'sigaa' (padrão, se houver), 'enviada' (do aparelho) ou 'nenhuma' (só iniciais)
+const foto = { modo: 'nenhuma', sigaa: '', dados: '' };
 const $ = id => document.getElementById(id);
 
 function chamar(dados) {
@@ -429,6 +468,9 @@ function buscarSiape() {
         return;
       }
       docenteAtual = { siape, nome: r.nome, unidade: r.unidade, situacao: r.situacao };
+      foto.sigaa = urlFotoValida(r.foto); foto.dados = '';
+      foto.modo = foto.sigaa ? 'sigaa' : 'nenhuma';
+      desenharFoto();
       $('nome-confirmado').textContent = r.nome;
       $('unidade-confirmada').textContent = r.unidade;
       const aviso = $('aviso-situacao');
@@ -450,6 +492,94 @@ function buscarSiape() {
     .finally(() => { btn.disabled = false; btn.textContent = 'Buscar'; });
 }
 $('siape').addEventListener('keydown', e => { if (e.key === 'Enter') buscarSiape(); });
+
+// ─── Foto (3:4, 354x472) ───────────────────────────────────────────────────
+const FOTO_L = 354, FOTO_A = 472, FOTO_MAX_BYTES = 150000;
+function urlFotoValida(u) {
+  const s = String(u || '').trim();
+  return /^https:\/\/sigaa\.unifesspa\.edu\.br\/sigaa\/verFoto\?[A-Za-z0-9=&%_.\-]+$/.test(s) ? s : '';
+}
+function iniciaisDe(nome) {
+  const p = String(nome || '').replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
+  if (!p.length) return '?';
+  return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+}
+function desenharFoto() {
+  const caixa = $('foto-caixa');
+  caixa.textContent = '';
+  const ini = iniciaisDe(docenteAtual && docenteAtual.nome);
+  let fonte = '';
+  if (foto.modo === 'enviada') fonte = foto.dados;
+  else if (foto.modo === 'sigaa') fonte = foto.sigaa;
+  caixa.textContent = ini;
+  if (fonte) {
+    const im = document.createElement('img');
+    im.alt = 'Sua foto'; im.referrerPolicy = 'no-referrer';
+    im.addEventListener('load', () => { caixa.textContent = ''; caixa.appendChild(im); });
+    im.addEventListener('error', () => {
+      // A foto do SIGAA não abriu: o cadastro segue sem foto, sem travar nada.
+      if (foto.modo === 'sigaa') { foto.modo = 'nenhuma'; desenharFoto(); $('erro-foto').textContent = 'Não foi possível carregar a foto do SIGAA. Você pode enviar outra pelo botão "Alterar foto" ou seguir só com as iniciais.'; $('erro-foto').style.display = 'block'; }
+    });
+    im.src = fonte;
+  }
+  const temFoto = foto.modo !== 'nenhuma';
+  $('foto-remover').hidden = !temFoto;
+  $('foto-alterar').textContent = temFoto ? 'Alterar foto' : 'Enviar uma foto';
+  $('foto-sigaa').hidden = !(foto.sigaa && foto.modo !== 'sigaa');
+  const notas = {
+    sigaa: 'Esta é a foto do seu cadastro no SIGAA. Ela aparece no banco de fontes, a menos que você troque ou remova.',
+    enviada: 'Foto enviada por você, recortada no formato 3x4. Ela só vai para o site depois que a ASCOM aprovar o cadastro.',
+    nenhuma: 'Sem foto, o cartão mostra apenas as suas iniciais.'
+  };
+  $('foto-nota').textContent = notas[foto.modo];
+}
+function lerImagem(arquivo) {
+  if (window.createImageBitmap) return createImageBitmap(arquivo);
+  return new Promise((ok, falha) => {
+    const u = URL.createObjectURL(arquivo), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(u); ok(im); };
+    im.onerror = () => { URL.revokeObjectURL(u); falha(new Error('imagem')); };
+    im.src = u;
+  });
+}
+// Recorta ao centro em 3:4 e gera JPEG de até ~150 KB
+function prepararFoto(arquivo) {
+  return lerImagem(arquivo).then(img => {
+    const w = img.width, h = img.height;
+    if (!w || !h) throw new Error('imagem');
+    const alvo = FOTO_L / FOTO_A;
+    let sw = w, sh = h;
+    if (w / h > alvo) sw = Math.round(h * alvo); else sh = Math.round(w / alvo);
+    const sx = Math.round((w - sw) / 2), sy = Math.round((h - sh) / 2);
+    for (const escala of [1, 0.75, 0.5]) {
+      const cw = Math.round(FOTO_L * escala), ch = Math.round(FOTO_A * escala);
+      const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, cw, ch);
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+      for (const q of [0.88, 0.8, 0.7, 0.6, 0.5]) {
+        const url = c.toDataURL('image/jpeg', q);
+        if (Math.floor((url.length - 23) * 3 / 4) <= FOTO_MAX_BYTES) return url;
+      }
+    }
+    throw new Error('grande');
+  });
+}
+$('foto-alterar').addEventListener('click', () => $('foto-arquivo').click());
+$('foto-arquivo').addEventListener('change', function () {
+  const arq = this.files && this.files[0];
+  this.value = '';
+  const erro = $('erro-foto'); erro.style.display = 'none';
+  if (!arq) return;
+  if (!/^image\//.test(arq.type)) { erro.textContent = 'Escolha um arquivo de imagem (JPG, PNG ou similar).'; erro.style.display = 'block'; return; }
+  if (arq.size > 15 * 1024 * 1024) { erro.textContent = 'A imagem é muito grande. Escolha uma de até 15 MB.'; erro.style.display = 'block'; return; }
+  prepararFoto(arq).then(url => { foto.dados = url; foto.modo = 'enviada'; desenharFoto(); })
+    .catch(() => { erro.textContent = 'Não foi possível usar essa imagem. Tente outro arquivo (JPG ou PNG).'; erro.style.display = 'block'; });
+});
+$('foto-remover').addEventListener('click', () => { foto.modo = 'nenhuma'; foto.dados = ''; $('erro-foto').style.display = 'none'; desenharFoto(); });
+$('foto-sigaa').addEventListener('click', () => { if (foto.sigaa) { foto.modo = 'sigaa'; foto.dados = ''; $('erro-foto').style.display = 'none'; desenharFoto(); } });
+desenharFoto();
 
 // ─── Disponibilidade ───────────────────────────────────────────────────────
 function definirDisponibilidade(radio) {
@@ -589,8 +719,11 @@ function enviar() {
     whatsapp: $('whatsapp').value.trim(),
     observacao: $('obs').value.trim(),
     formacoes: coletarFormacoes(),
+    autorizo: true,
+    foto_modo: foto.modo,
     site: $('site').value
   };
+  if (foto.modo === 'enviada') dados.foto_dados = foto.dados;
   $('erro-envio').style.display = 'none';
   $('loading').style.display = 'block';
   $('btn-enviar').disabled = true;
@@ -632,6 +765,13 @@ function validar() {
   $('erro-email').style.display = 'none';
   if (!emailValido(em)) { marcar('email'); $('erro-email').style.display = 'block'; }
   if (tags.length === 0) { $('tags-container').style.borderColor = 'var(--erro)'; ok = false; if (!primeiro) primeiro = $('tags-container'); }
+  $('erro-autorizo').style.display = 'none';
+  if (!$('autorizo').checked) {
+    $('erro-autorizo').style.display = 'block';
+    $('rotulo-autorizo').classList.add('campo-erro');
+    $('autorizo').addEventListener('change', () => $('rotulo-autorizo').classList.remove('campo-erro'), { once: true });
+    ok = false; if (!primeiro) primeiro = $('rotulo-autorizo');
+  }
   if (coletarFormacoes().length === 0) {
     const e = $('erro-envio');
     e.textContent = 'Adicione pelo menos uma formação, com curso e instituição.';

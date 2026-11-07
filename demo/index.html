@@ -47,9 +47,11 @@
   .busca { background: var(--card); border-radius: 12px; padding: 22px; box-shadow: var(--sombra); margin-bottom: 20px; }
   .busca h2 { font-size: 1.15rem; }
   .busca .ajuda { color: var(--muted); font-size: .92rem; margin: 2px 0 14px; }
-  .campos { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+  .campos { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; }
   .campos input, .campos select { width: 100%; padding: 12px 14px; border: 1px solid var(--borda); border-radius: 8px; background: var(--card); min-height: 46px; }
   .campos input:focus, .campos select:focus { border-color: var(--verde); }
+  .btn-buscar { border: 0; background: var(--verde); color: #fff; padding: 0 28px; min-height: 46px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+  .btn-buscar:hover { background: var(--verde-escuro); }
   .temas { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
   .temas[hidden] { display: none; }
   .temas strong { font-size: .9rem; color: var(--muted); margin-right: 4px; }
@@ -62,7 +64,8 @@
   .grade { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
   .cartao { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 12px; }
   .cab { display: flex; gap: 14px; align-items: flex-start; }
-  .avatar { flex: none; width: 56px; height: 56px; border-radius: 10px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.15rem; }
+  .avatar { flex: none; width: 72px; height: 96px; border-radius: 8px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.35rem; overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .cab h3 { font-size: 1.1rem; line-height: 1.2; }
   .cab .titulacao { color: var(--verde); font-weight: 700; font-size: .95rem; margin-top: 3px; }
   .cab .unidade { color: var(--muted); font-size: .87rem; margin-top: 3px; }
@@ -93,7 +96,8 @@
   .vazio p { color: var(--muted); }
   .vazio a { color: var(--verde); font-weight: 700; }
 
-  .rodape { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; color: var(--muted); font-size: .85rem; }
+  .rodape { max-width: 1200px; margin: 0 auto; padding: 0 20px 14px; color: var(--muted); font-size: .85rem; }
+  .rodape.ultimo { padding-bottom: 40px; }
 
   .fundo { position: fixed; inset: 0; background: rgba(10,20,14,.55); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
   .fundo.aberto { display: flex; }
@@ -145,8 +149,8 @@
 <main>
   <section class="busca" aria-labelledby="t-busca">
     <h2 id="t-busca">Encontre uma fonte para a sua pauta</h2>
-    <p class="ajuda">Procure pelo assunto, como "dengue", "mineração" ou "inteligência artificial", ou pelo nome do especialista.</p>
-    <div class="campos">
+    <p class="ajuda">Procure pelo assunto, como "dengue", "mineração" ou "inteligência artificial", ou pelo nome do especialista. Digite e clique em Buscar, ou aperte Enter. A lista também se atualiza enquanto você digita.</p>
+    <form class="campos" id="form-busca" role="search">
       <input type="search" id="q" placeholder="Assunto ou nome do especialista" autocomplete="off" aria-label="Assunto ou nome do especialista">
       <select id="f-campus" aria-label="Campus"><option value="">Todos os campi</option></select>
       <select id="f-formato" aria-label="Formato de atendimento">
@@ -156,7 +160,8 @@
         <option>Rádio ou áudio</option>
         <option>E-mail</option>
       </select>
-    </div>
+      <button type="submit" class="btn-buscar" id="buscar">Buscar</button>
+    </form>
     <div class="temas" id="temas" hidden><strong>Temas mais buscados:</strong></div>
     <div class="linha-info">
       <span id="contagem" aria-live="polite"></span>
@@ -168,6 +173,7 @@
 </main>
 
 <p class="rodape" id="rodape">Dados fictícios, criados para demonstração e testes do método. O contato é intermediado pela Assessoria de Comunicação (ASCOM) da Unifesspa.</p>
+<p class="rodape ultimo" id="aviso-busca">As buscas feitas nesta página são registradas de forma anônima (termo, filtros e número de resultados), sem nenhum dado pessoal, para melhorar o banco de fontes.</p>
 
 <div class="fundo" id="fundo" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
   <div class="modal">
@@ -202,6 +208,9 @@
   'use strict';
   var JSON_URL = '../dados/demo/docentes-demo.json';
   var EMAIL_ASCOM = 'ascom@unifesspa.edu.br';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
+  var ORIGEM = 'demo';
+  var ESPERA_REGISTRO = 2000;
   var CAMPI = ['Marabá (Campus Sede)', 'Canaã dos Carajás', 'Xinguara', 'Rondon do Pará', 'São Félix do Xingu', 'Santana do Araguaia'];
   var NIVEIS = ['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado'];
 
@@ -211,6 +220,9 @@
   var falhou = false;
   var atual = null;
   var identidade = { nome: '', veiculo: '', tel: '' };
+  var ultimoN = 0;
+  var ultimoRegistro = '';
+  var timerRegistro = null;
 
   function norm(s) {
     return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -231,6 +243,12 @@
       var x = new URL(u);
       return (x.protocol === 'https:' || x.protocol === 'http:') && /(^|\.)cnpq\.br$/i.test(x.hostname) ? x.href : '';
     } catch (e) { return ''; }
+  }
+  function fotoValida(u) {
+    var s = String(u || '').trim();
+    if (/^https:\/\/sigaa\.unifesspa\.edu\.br\/sigaa\/verFoto\?[A-Za-z0-9=&%_.\-]+$/.test(s)) return s;
+    if (/^fotos\/[A-Za-z0-9_-]+\.jpg$/.test(s)) return s;
+    return '';
   }
   function iniciais(nome) {
     var p = String(nome).replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
@@ -261,7 +279,7 @@
       id: String(d.id || ''), nome: String(d.nome || ''), unidade: String(d.unidade || ''),
       campus: String(d.campus || ''), resumo: String(d.resumo || ''),
       temas: temas, formatos: formatos, formacoes: fs,
-      lattes: lattesValido(String(d.lattes || '')), titulo: titulacao(d),
+      lattes: lattesValido(String(d.lattes || '')), titulo: titulacao(d), foto: fotoValida(d.foto),
       busca: norm([d.nome, d.unidade, d.campus, d.resumo, temas.join(' '),
         fs.map(function (f) { return (f && f.curso) || ''; }).join(' ')].join(' '))
     };
@@ -289,7 +307,7 @@
     box.hidden = false;
     ts.forEach(function (t) {
       var b = el('button', 'chip', t); b.type = 'button';
-      b.addEventListener('click', function () { $('q').value = t; filtrar(); });
+      b.addEventListener('click', function () { $('q').value = t; filtrar(); registrarBusca(true); });
       box.appendChild(b);
     });
   }
@@ -303,7 +321,15 @@
   function cartao(d) {
     var c = el('article', 'cartao');
     var cab = el('div', 'cab');
-    cab.appendChild(el('div', 'avatar', iniciais(d.nome)));
+    var av = el('div', 'avatar', iniciais(d.nome));
+    if (d.foto) {
+      var im = document.createElement('img');
+      im.alt = 'Foto de ' + d.nome; im.decoding = 'async';
+      im.referrerPolicy = 'no-referrer'; im.width = 72; im.height = 96;
+      im.addEventListener('load', function () { av.textContent = ''; av.appendChild(im); });
+      im.src = d.foto;
+    }
+    cab.appendChild(av);
     var info = el('div');
     info.appendChild(el('h3', null, d.nome));
     if (d.titulo) info.appendChild(el('div', 'titulacao', d.titulo));
@@ -316,7 +342,7 @@
       var tg = el('div', 'tags');
       d.temas.forEach(function (t) {
         var b = el('button', 'tag', t); b.type = 'button'; b.title = 'Buscar por ' + t;
-        b.addEventListener('click', function () { $('q').value = t; filtrar(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        b.addEventListener('click', function () { $('q').value = t; filtrar(); registrarBusca(true); window.scrollTo({ top: 0, behavior: 'smooth' }); });
         tg.appendChild(b);
       });
       c.appendChild(tg);
@@ -368,14 +394,40 @@
     } else {
       res.forEach(function (d) { g.appendChild(cartao(d)); });
     }
+    ultimoN = res.length;
     var n = docentes.length;
     $('contagem').textContent = n === 0 ? '' : res.length + ' de ' + n + (n === 1 ? ' especialista' : ' especialistas');
     marcarChips();
   }
 
+  // Registro anônimo das buscas: só termo, filtros e número de resultados.
+  // Imediato ao clicar em Buscar, apertar Enter ou escolher um tema; com espera de 2 s quando a pessoa só digita.
+  function registrarBusca(agora) {
+    if (timerRegistro) { clearTimeout(timerRegistro); timerRegistro = null; }
+    if (!carregado || falhou) return;
+    var fazer = function () {
+      timerRegistro = null;
+      var termo = $('q').value.trim().slice(0, 80), campus = $('f-campus').value, formato = $('f-formato').value;
+      if (!termo && !campus && !formato) return;
+      var chave = norm(termo) + '|' + campus + '|' + formato;
+      if (chave === ultimoRegistro) return;
+      ultimoRegistro = chave;
+      try {
+        fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+          body: JSON.stringify({ acao: 'buscar', termo: termo, campus: campus, formato: formato, n_resultados: ultimoN, origem: ORIGEM }) }).catch(function () {});
+      } catch (e) { /* o registro nunca atrapalha a busca */ }
+    };
+    if (agora) fazer(); else timerRegistro = setTimeout(fazer, ESPERA_REGISTRO);
+  }
+  function aoDigitar() {
+    filtrar();
+    if ($('q').value.trim().length >= 3 || $('f-campus').value || $('f-formato').value) registrarBusca(false);
+  }
+
   function limpar() {
     $('q').value = ''; $('f-campus').selectedIndex = 0; $('f-formato').selectedIndex = 0;
     $('f-campus').value = ''; $('f-formato').value = '';
+    if (timerRegistro) { clearTimeout(timerRegistro); timerRegistro = null; }
     filtrar(); $('q').focus();
   }
 
@@ -441,9 +493,10 @@
   ['m-nome', 'm-veiculo', 'm-formato', 'm-prazo', 'm-pauta', 'm-tel'].forEach(function (id) {
     $(id).addEventListener('input', atualizarPrevia); $(id).addEventListener('change', atualizarPrevia);
   });
-  $('q').addEventListener('input', filtrar);
-  $('f-campus').addEventListener('change', filtrar);
-  $('f-formato').addEventListener('change', filtrar);
+  $('q').addEventListener('input', aoDigitar);
+  $('f-campus').addEventListener('change', aoDigitar);
+  $('f-formato').addEventListener('change', aoDigitar);
+  $('form-busca').addEventListener('submit', function (e) { e.preventDefault(); filtrar(); registrarBusca(true); });
   $('limpar').addEventListener('click', limpar);
   $('m-fechar').addEventListener('click', fecharModal);
   $('m-copiar').addEventListener('click', copiar);

@@ -47,6 +47,28 @@
   th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
   .vazio { color:var(--muted); text-align:center; padding:28px; }
   .tabela-wrap { overflow-x:auto; }
+  .cab-item { display:flex; gap:14px; align-items:flex-start; }
+  .foto-item { flex:none; width:72px; height:96px; border-radius:8px; background:var(--tag-bg); color:var(--tag-cor); display:grid; place-items:center; font-weight:800; font-size:1.3rem; overflow:hidden; }
+  .foto-item img { width:100%; height:100%; object-fit:cover; display:block; }
+  .filtros-est { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+  .filtros-est select { width:auto; min-width:220px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px; }
+  .kpi { background:var(--card); border-radius:12px; padding:16px 18px; box-shadow:var(--sombra); }
+  .kpi .v { font-size:1.9rem; font-weight:800; color:var(--verde); line-height:1.1; }
+  .kpi .r { color:var(--muted); font-size:.85rem; margin-top:4px; }
+  .grade-est { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
+  .bloco { background:var(--card); border-radius:12px; padding:18px; box-shadow:var(--sombra); }
+  .bloco h3 { font-size:1rem; margin-bottom:4px; }
+  .bloco .nota { color:var(--muted); font-size:.82rem; margin-bottom:12px; }
+  .barra-l { display:grid; grid-template-columns:minmax(90px,38%) 1fr 34px; gap:10px; align-items:center; font-size:.88rem; margin:6px 0; }
+  .barra-l .rot { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .barra-l .trilho { background:var(--bg); border-radius:4px; height:14px; overflow:hidden; }
+  .barra-l .preen { background:var(--verde); height:100%; border-radius:4px; min-width:2px; }
+  .barra-l .preen.alerta { background:#b26a00; }
+  .barra-l .num { text-align:right; font-variant-numeric:tabular-nums; font-weight:700; }
+  .dias { display:flex; align-items:flex-end; gap:3px; height:120px; border-bottom:1px solid var(--borda); }
+  .dias .col { flex:1; background:var(--verde); border-radius:3px 3px 0 0; min-height:2px; }
+  .dias-eixo { display:flex; justify-content:space-between; color:var(--muted); font-size:.78rem; margin-top:4px; }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -114,10 +136,12 @@
     { id: 'publicados', nome: 'Publicados', filtro: function (c) { return c.status === 'aprovado'; } },
     { id: 'email', nome: 'Aguardando e-mail', filtro: function (c) { return c.status === 'aguardando_email'; } },
     { id: 'recusas', nome: 'Não querem participar', filtro: function (c) { return c.status === 'recusou'; } },
-    { id: 'convite', nome: 'Ainda não responderam', filtro: null }
+    { id: 'convite', nome: 'Ainda não responderam', filtro: null },
+    { id: 'estatisticas', nome: 'Estatísticas', filtro: null }
   ];
 
   function contar(a) {
+    if (a.id === 'estatisticas') return null;
     if (a.id === 'convite') return dados.sigaa.filter(function (x) { return x.situacao === 'novo'; }).length;
     return dados.cadastros.filter(a.filtro).length;
   }
@@ -126,12 +150,13 @@
     var bar = $('abas'); bar.textContent = '';
     ABAS.forEach(function (a) {
       var b = el('button', 'aba'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', a.id === aba ? 'true' : 'false');
-      b.appendChild(document.createTextNode(a.nome)); b.appendChild(el('span', 'n', '(' + contar(a) + ')'));
+      b.appendChild(document.createTextNode(a.nome)); var qtd = contar(a); if (qtd !== null) b.appendChild(el('span', 'n', '(' + qtd + ')'));
       b.addEventListener('click', function () { aba = a.id; desenhar(); });
       bar.appendChild(b);
     });
     var c = $('conteudo'); c.textContent = '';
     if (aba === 'convite') return desenharConvite(c);
+    if (aba === 'estatisticas') return desenharEstatisticas(c);
     var def = ABAS.filter(function (a) { return a.id === aba; })[0];
     var itens = dados.cadastros.filter(def.filtro).sort(function (a, b) { return a.criado_em < b.criado_em ? 1 : -1; });
     if (!itens.length) { c.appendChild(el('div', 'caixa vazio', 'Nada por aqui.')); return; }
@@ -140,13 +165,40 @@
     c.appendChild(l);
   }
 
+  function iniciais(nome) {
+    var p = String(nome || '').replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
+    if (!p.length) return '?';
+    return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+  }
+  function fotoSegura(u) {
+    var s = String(u || '').trim();
+    if (/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s)) return s;
+    if (/^https:\/\/sigaa\.unifesspa\.edu\.br\/sigaa\/verFoto\?[A-Za-z0-9=&%_.\-]+$/.test(s)) return s;
+    if (/^fotos\/[A-Za-z0-9_-]+\.jpg$/.test(s)) return '../' + s;
+    return '';
+  }
+
   function linha(rot, val) { var p = el('p', 'linha'); p.appendChild(el('b', null, rot + ': ')); p.appendChild(document.createTextNode(val || 'não informado')); return p; }
 
   function item(i) {
     var box = el('article', 'item');
+    var cab = el('div', 'cab-item');
+    var fh = fotoSegura(i.foto);
+    if (i.status !== 'recusou') {
+      var fb = el('div', 'foto-item', iniciais(i.nome));
+      if (fh) {
+        var im = document.createElement('img'); im.alt = 'Foto de ' + i.nome; im.referrerPolicy = 'no-referrer';
+        im.addEventListener('load', function () { fb.textContent = ''; fb.appendChild(im); });
+        im.src = fh;
+      }
+      cab.appendChild(fb);
+    }
+    var tit = el('div');
     var h = el('h3', null, i.nome); if (i.status === 'aprovado') h.appendChild(el('span', 'selo', 'publicado'));
-    box.appendChild(h);
-    box.appendChild(el('div', 'un', [i.unidade, i.campus, 'SIAPE ' + i.siape].filter(Boolean).join(' · ')));
+    tit.appendChild(h);
+    tit.appendChild(el('div', 'un', [i.unidade, i.campus, 'SIAPE ' + i.siape].filter(Boolean).join(' · ')));
+    cab.appendChild(tit);
+    box.appendChild(cab);
     if (i.status !== 'recusou') {
       box.appendChild(linha('Apresentação', i.resumo));
       box.appendChild(linha('Temas', i.temas));
@@ -159,6 +211,8 @@
       var pl = el('p', 'linha'); pl.appendChild(el('b', null, 'Lattes: '));
       if (lh) { var a = el('a', null, lh); a.href = lh; a.target = '_blank'; a.rel = 'noopener noreferrer'; pl.appendChild(a); } else pl.appendChild(document.createTextNode('não informado'));
       box.appendChild(pl);
+      box.appendChild(linha('Foto', ({ sigaa: 'a do SIGAA, mantida pelo docente', enviada: 'enviada pelo docente', nenhuma: 'sem foto (só iniciais)' })[i.foto_modo] || 'não informado (cadastro anterior)'));
+      box.appendChild(linha('Autorização de divulgação', i.autorizacao ? 'marcada em ' + dt(i.autorizacao) : 'não registrada (cadastro anterior à caixa de autorização)'));
       if (i.observacao) box.appendChild(linha('Observação do docente', i.observacao));
     }
     box.appendChild(linha('Enviado em', dt(i.criado_em)));
@@ -205,6 +259,98 @@
       if (!atuais.length) wrap.appendChild(el('div', 'vazio', 'Nenhum docente nesta lista.'));
     }
     busca.addEventListener('input', mostrar); mostrar();
+  }
+
+  // ── Estatísticas (buscas registradas e acervo publicado) ──
+  var origemSel = '';
+  var metr = null;
+  function numBR(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+  function diaBR(d) { var p = String(d).split('-'); return p.length === 3 ? p[2] + '/' + p[1] : d; }
+  function kpi(v, r) { var k = el('div', 'kpi'); k.appendChild(el('div', 'v', v)); k.appendChild(el('div', 'r', r)); return k; }
+  function bloco(titulo, nota) {
+    var b = el('section', 'bloco'); b.appendChild(el('h3', null, titulo)); if (nota) b.appendChild(el('p', 'nota', nota)); return b;
+  }
+  function barras(itens, alerta) {
+    var w = el('div'); var max = 0;
+    itens.forEach(function (x) { if (x.n > max) max = x.n; });
+    if (!itens.length) { w.appendChild(el('p', 'nota', 'Ainda sem dados.')); return w; }
+    itens.forEach(function (x) {
+      var l = el('div', 'barra-l');
+      var rot = el('span', 'rot', x.rot); rot.title = x.rot; l.appendChild(rot);
+      var tr = el('span', 'trilho'); var pr = el('span', 'preen' + (alerta ? ' alerta' : '')); pr.style.display = 'block'; pr.style.width = (max ? Math.max(1, Math.round(x.n / max * 100)) : 0) + '%'; tr.appendChild(pr); l.appendChild(tr);
+      l.appendChild(el('span', 'num', numBR(x.n)));
+      w.appendChild(l);
+    });
+    return w;
+  }
+  function deObjeto(o, topo) {
+    var a = Object.keys(o || {}).map(function (k) { return { rot: k, n: o[k] }; });
+    a.sort(function (x, y) { return y.n - x.n || x.rot.localeCompare(y.rot, 'pt-BR'); });
+    return topo ? a.slice(0, topo) : a;
+  }
+  function serieDias(porDia) {
+    var ks = Object.keys(porDia || {}).sort();
+    if (!ks.length) return [];
+    var out = [], d = new Date(ks[0] + 'T12:00:00'), fim = new Date(ks[ks.length - 1] + 'T12:00:00'), n = 0;
+    while (d <= fim && n < 90) { var k = d.toISOString().slice(0, 10); out.push({ dia: k, n: porDia[k] || 0 }); d.setDate(d.getDate() + 1); n++; }
+    return out;
+  }
+  function desenharEstatisticas(c) {
+    var f = el('div', 'filtros-est');
+    var lb = el('label', null, 'Buscas de:'); lb.style.margin = '0'; lb.setAttribute('for', 'sel-origem');
+    var sel = el('select'); sel.id = 'sel-origem';
+    [['', 'Todas (banco real e demonstração)'], ['real', 'Banco real'], ['demo', 'Banco de demonstração (dados fictícios)']].forEach(function (o) {
+      var op = el('option', null, o[1]); op.value = o[0]; if (o[0] === origemSel) op.selected = true; sel.appendChild(op);
+    });
+    var at = botao('Atualizar', '', function () { buscarMetricas(c, corpo); });
+    f.appendChild(lb); f.appendChild(sel); f.appendChild(at); c.appendChild(f);
+    var corpo = el('div'); c.appendChild(corpo);
+    sel.addEventListener('change', function () { origemSel = sel.value; buscarMetricas(c, corpo); });
+    if (metr && metr.origem === (origemSel || 'todas')) mostrarMetricas(corpo, metr); else buscarMetricas(c, corpo);
+  }
+  function buscarMetricas(c, corpo) {
+    corpo.textContent = ''; corpo.appendChild(el('div', 'caixa vazio', 'Carregando...'));
+    chamar({ acao: 'metricas', origem: origemSel }).then(function (r) {
+      corpo.textContent = '';
+      if (r.status !== 'ok') { corpo.appendChild(el('div', 'caixa vazio', r.msg || 'Não foi possível carregar as estatísticas.')); return; }
+      metr = r; mostrarMetricas(corpo, r);
+    }).catch(function () { corpo.textContent = ''; corpo.appendChild(el('div', 'caixa vazio', 'Falha de conexão.')); });
+  }
+  function mostrarMetricas(corpo, r) {
+    corpo.textContent = '';
+    var b = r.buscas || {}, a = r.acervo || {};
+    var pct = b.total ? Math.round(b.sem_resultado / b.total * 100) : 0;
+    var k = el('div', 'kpis');
+    k.appendChild(kpi(numBR(b.total), 'buscas registradas'));
+    k.appendChild(kpi(b.total ? pct + '%' : '–', 'sem nenhum resultado (' + numBR(b.sem_resultado) + ')'));
+    k.appendChild(kpi(numBR(a.total), 'fontes publicadas no banco real'));
+    k.appendChild(kpi(b.ultima ? dt(b.ultima) : '–', 'última busca'));
+    corpo.appendChild(k);
+
+    var g = el('div', 'grade-est');
+    var d = bloco('Buscas por dia', 'Cada coluna é um dia (horário de Brasília).');
+    var serie = serieDias(b.por_dia);
+    if (serie.length) {
+      var max = 0; serie.forEach(function (x) { if (x.n > max) max = x.n; });
+      var cols = el('div', 'dias'); cols.setAttribute('role', 'img'); cols.setAttribute('aria-label', 'Buscas por dia, de ' + diaBR(serie[0].dia) + ' a ' + diaBR(serie[serie.length - 1].dia));
+      serie.forEach(function (x) { var cl = el('div', 'col'); cl.style.height = (max ? Math.max(2, Math.round(x.n / max * 100)) : 2) + '%'; cl.title = diaBR(x.dia) + ': ' + x.n; cols.appendChild(cl); });
+      d.appendChild(cols);
+      var eixo = el('div', 'dias-eixo'); eixo.appendChild(el('span', null, diaBR(serie[0].dia))); eixo.appendChild(el('span', null, 'máximo em um dia: ' + max)); eixo.appendChild(el('span', null, diaBR(serie[serie.length - 1].dia))); d.appendChild(eixo);
+    } else d.appendChild(el('p', 'nota', 'Ainda sem buscas registradas.'));
+    g.appendChild(d);
+
+    var t = bloco('Assuntos mais buscados', 'Termos normalizados (sem acento, em minúsculas).');
+    t.appendChild(barras((b.mais_buscados || []).slice(0, 12).map(function (x) { return { rot: x.termo, n: x.n }; }))); g.appendChild(t);
+    var sr = bloco('Buscas sem resultado', 'Assuntos que os jornalistas procuraram e o banco não tinha. Indicam quem convidar.');
+    sr.appendChild(barras((b.sem_resultado_termos || []).slice(0, 12).map(function (x) { return { rot: x.termo, n: x.sem }; }), true)); g.appendChild(sr);
+    var bc = bloco('Buscas por campus (quando filtrado)'); bc.appendChild(barras(deObjeto(b.por_campus))); g.appendChild(bc);
+    var bf = bloco('Buscas por formato (quando filtrado)'); bf.appendChild(barras(deObjeto(b.por_formato))); g.appendChild(bf);
+    var ac = bloco('Fontes publicadas por campus', 'Apenas o banco real, cadastros aprovados.'); ac.appendChild(barras(deObjeto(a.por_campus))); g.appendChild(ac);
+    var af = bloco('Fontes por formato de atendimento', 'Apenas o banco real, cadastros aprovados.'); af.appendChild(barras(deObjeto(a.por_formato))); g.appendChild(af);
+    var at = bloco('Temas mais frequentes no acervo', 'Apenas o banco real, cadastros aprovados.');
+    at.appendChild(barras((a.temas || []).slice(0, 12).map(function (x) { return { rot: x.tema, n: x.n }; }))); g.appendChild(at);
+    corpo.appendChild(g);
+    corpo.appendChild(el('p', 'un', 'As buscas são registradas sem nenhum dado pessoal: apenas termo, filtros, número de resultados e origem (banco real ou demonstração).'));
   }
 
   function exportar(lista) {

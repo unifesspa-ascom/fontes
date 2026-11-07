@@ -1,8 +1,8 @@
 """Gera dados/demo/docentes-demo.json (30 perfis FICTICIOS para demonstracao e testes).
 
 Uso, a partir da raiz do repositorio:  python3 scripts/gerar_demo.py
-Os nomes sao inventados. O script confere que nenhum coincide com a lista publica
-dados/docentes-sigaa.json (nome completo, ou primeiro mais ultimo nome).
+Os nomes sao inventados. Se existir um arquivo local dados/docentes-sigaa.json (nao versionado), o script confere
+que nenhum nome coincide com ele (nome completo, ou primeiro mais ultimo nome).
 """
 import json, datetime, os
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,11 +62,16 @@ print(collections.Counter(d['campus'] for d in docs))
 txt=' '.join(norm(' '.join([d['nome'],d['resumo'],' '.join(d['temas'])])) for d in docs)
 for w in ['peixe','astronom','pesca','pescado','dengue','mineracao']: print(w, txt.count(w))
 print('nomes unicos',len({d['nome'] for d in docs}))
-# colisão com lista SIGAA pública (só contagem)
-s=json.load(open(os.path.join(RAIZ,'dados','docentes-sigaa.json'),encoding='utf-8'))['docentes']
-real=[norm(x['nome']).split() for x in s]
-full={' '.join(x) for x in real}
-fl={(x[0],x[-1]) for x in real if x}
-c1=sum(1 for d in docs if norm(d['nome']) in full)
-c2=sum(1 for d in docs if (norm(d['nome']).split()[0],norm(d['nome']).split()[-1]) in fl)
-print('colisao nome completo',c1,'primeiro+ultimo',c2)
+# Conferência de colisão com nomes reais (só contagem). A lista do SIGAA não fica mais no repositório
+# público; se o arquivo local existir (ex.: baixado só na máquina da autora), a conferência roda.
+CAM=os.path.join(RAIZ,'dados','docentes-sigaa.json')
+if os.path.exists(CAM):
+    s=json.load(open(CAM,encoding='utf-8'))['docentes']
+    real=[norm(x['nome']).split() for x in s]
+    full={' '.join(x) for x in real}
+    fl={(x[0],x[-1]) for x in real if x}
+    c1=sum(1 for d in docs if norm(d['nome']) in full)
+    c2=sum(1 for d in docs if (norm(d['nome']).split()[0],norm(d['nome']).split()[-1]) in fl)
+    print('colisao nome completo',c1,'primeiro+ultimo',c2)
+else:
+    print('Conferência de colisão com nomes reais não executada: dados/docentes-sigaa.json não existe neste ambiente.')
