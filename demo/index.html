@@ -64,8 +64,8 @@
   .grade { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
   .cartao { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 12px; }
   .cab { display: flex; gap: 14px; align-items: flex-start; }
-  .avatar { flex: none; width: 72px; height: 96px; border-radius: 8px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.35rem; overflow: hidden; }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar { flex: none; position: relative; width: 84px; height: 112px; border-radius: 8px; background: var(--tag-bg); color: var(--tag-cor); display: grid; place-items: center; font-weight: 800; font-size: 1.35rem; overflow: hidden; }
+  .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .cab h3 { font-size: 1.1rem; line-height: 1.2; }
   .cab .titulacao { color: var(--verde); font-weight: 700; font-size: .95rem; margin-top: 3px; }
   .cab .unidade { color: var(--muted); font-size: .87rem; margin-top: 3px; }
@@ -82,13 +82,19 @@
 
   /* Lista em linhas: cada cartão ocupa a largura toda e organiza o conteúdo em três blocos */
   @media (min-width: 900px) {
-    .cartao { display: grid; grid-template-columns: 290px minmax(0, 1fr) 190px; grid-template-rows: auto auto auto; column-gap: 28px; row-gap: 10px; align-items: start; min-height: 190px; }
-    .cartao .cab { grid-column: 1; grid-row: 1 / span 3; }
-    .cartao .resumo { grid-column: 2; grid-row: 1; }
-    .cartao .tags { grid-column: 2; grid-row: 2; }
-    .cartao .atende { grid-column: 2; grid-row: 3; }
-    .cartao .acoes { grid-column: 3; grid-row: 1 / span 3; align-self: center; flex-direction: column; }
+    .cartao { display: grid; grid-template-columns: 124px 230px minmax(0, 1fr) 190px; grid-template-rows: auto auto auto; column-gap: 28px; row-gap: 10px; align-items: start; min-height: 190px; }
+    /* A foto ocupa toda a altura do cartão, com a mesma margem (20 px) em cima, embaixo e à esquerda */
+    .cartao .cab { display: contents; }
+    .cartao .avatar { grid-column: 1; grid-row: 1 / span 3; width: auto; height: auto; align-self: stretch; margin-right: -8px; }
+    .cartao .cab > div:not(.avatar) { grid-column: 2; grid-row: 1 / span 3; }
+    .cartao .resumo { grid-column: 3; grid-row: 1; }
+    .cartao .tags { grid-column: 3; grid-row: 2; }
+    .cartao .atende { grid-column: 3; grid-row: 3; }
+    .cartao .acoes { grid-column: 4; grid-row: 1 / span 3; align-self: center; flex-direction: column; }
     .cartao .acoes .btn-solicitar { flex: none; }
+  }
+  @media (min-width: 900px) and (max-width: 1119px) {
+    .cartao { grid-template-columns: 104px 200px minmax(0, 1fr) 170px; column-gap: 22px; }
   }
 
   .vazio { grid-column: 1 / -1; background: var(--card); border-radius: 12px; padding: 28px; box-shadow: var(--sombra); text-align: center; }
@@ -325,7 +331,7 @@
     if (d.foto) {
       var im = document.createElement('img');
       im.alt = 'Foto de ' + d.nome; im.decoding = 'async';
-      im.referrerPolicy = 'no-referrer'; im.width = 72; im.height = 96;
+      im.referrerPolicy = 'no-referrer';
       im.addEventListener('load', function () { av.textContent = ''; av.appendChild(im); });
       im.src = d.foto;
     }
