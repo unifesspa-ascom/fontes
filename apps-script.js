@@ -291,6 +291,7 @@ function moderar(d) {
     const alteracoes = [];
     if (decisao === 'aprovar') {
       if (r.status !== 'aguardando_ascom') return { status: 'erro', msg: 'Só é possível aprovar cadastros com e-mail confirmado.' };
+      if (d.identidade_conferida !== true) return { status: 'erro', msg: 'A ASCOM precisa conferir a identidade e a correspondência entre SIAPE e e-mail antes de publicar.' };
       antigos.forEach(function (x) { alteracoes.push({ registro: x, novo: { status: 'substituido' } }); });
       alteracoes.push({ registro: r, novo: { status: 'aprovado', moderado_em: agora } });
     } else if (decisao === 'rejeitar') {
