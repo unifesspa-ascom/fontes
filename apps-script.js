@@ -47,6 +47,7 @@ function doPost(e) {
       case 'verificar': return resp(verificar(d));
       case 'cadastro':  return resp(cadastrar(d));
       case 'recusa':    return resp(recusar(d));
+      case 'reenviar':  return resp(reenviarConfirmacao(d));
       case 'painel':    return resp(painel(d));
       case 'moderar':   return resp(moderar(d));
       case 'buscar':    return resp(registrarBusca(d));
@@ -88,7 +89,7 @@ function cadastrar(d) {
   if (!doc) return { status: 'erro', msg: 'SIAPE não encontrado.' };
 
   const email = limpar(d.email, 120).toLowerCase();
-  if (!/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/.test(email) || email.slice(-DOMINIO_EMAIL.length) !== DOMINIO_EMAIL) {
+  if (!emailInstitucionalValido(email)) {
     return { status: 'erro', msg: 'Use seu e-mail institucional (' + DOMINIO_EMAIL + ').' };
   }
   const campus = CAMPI.indexOf(d.campus) >= 0 ? d.campus : '';
@@ -165,7 +166,7 @@ function recusar(d) {
     }
     if (sit !== 'recusou') {
       const email = limpar(d.email, 120).toLowerCase();
-      if (!/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.unifesspa\.edu\.br$/.test(email)) {
+      if (!emailInstitucionalValido(email)) {
         return { status: 'erro', msg: 'Informe um e-mail institucional válido para confirmar sua resposta.' };
       }
       const sh = abaCadastros();
@@ -186,6 +187,50 @@ function recusar(d) {
     }
   } finally { lock.releaseLock(); }
   return { status: 'ok' };
+}
+
+/** Confere o domínio exato, sem aceitar subdomínios ou sufixos enganosos. */
+function emailInstitucionalValido(valor) {
+  return /^[a-z0-9._%+\-]+@unifesspa\.edu\.br$/.test(String(valor || '').toLowerCase());
+}
+
+/** Reenvio controlado: nunca revela se um SIAPE/e-mail está cadastrado. */
+function reenviarConfirmacao(d) {
+  if (d.site) return { status: 'ok', msg: 'Se houver uma confirmação pendente, enviaremos um novo link.' };
+  const siape = soDigitos(d.siape);
+  const email = limpar(d.email, 120).toLowerCase();
+  const neutra = { status: 'ok', msg: 'Se houver uma confirmação pendente para esses dados, enviaremos um novo link.' };
+  if (siape.length < 6 || siape.length > 8 || !emailInstitucionalValido(email)) {
+    return { status: 'erro', msg: 'Informe SIAPE e e-mail institucional válidos.' };
+  }
+  if (!limitar('reenviar', 20, 600)) return { status: 'erro', msg: 'Muitas solicitações. Tente novamente mais tarde.' };
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const sh = abaCadastros();
+    const rows = lerCadastros(sh).filter(function (r) {
+      return r.siape === siape && r.email.toLowerCase() === email &&
+        (r.status === 'aguardando_email' || r.status === 'aguardando_email_recusa');
+    }).sort(function (a, b) { return b._linha - a._linha; });
+    if (!rows.length) return neutra;
+    const r = rows[0];
+    // Evita reenvios repetidos. Usar cache por registro, nunca por endereço em logs.
+    const cache = CacheService.getScriptCache();
+    const chave = 'reenviar_' + r.id;
+    if (cache.get(chave)) return neutra;
+    const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+    const anterior = { token: r.token, token_expira: r.token_expira };
+    atualizarLinha(sh, r._linha, { token: token, token_expira: new Date(Date.now() + 48 * 3600 * 1000).toISOString() });
+    try {
+      enviarLinkDeConfirmacao(email, r.nome, token, r.status === 'aguardando_email_recusa');
+      cache.put(chave, '1', 300);
+    } catch (e) {
+      try { atualizarLinha(sh, r._linha, anterior); }
+      catch (rollbackError) { console.error('Falha ao restaurar token após erro de envio: ' + rollbackError); }
+      console.error('Falha no reenvio da confirmação: ' + e);
+      return { status: 'erro', msg: 'Não foi possível enviar a confirmação agora. Tente novamente mais tarde.' };
+    }
+    return neutra;
+  } finally { lock.releaseLock(); }
 }
 
 function confirmarEmail(token) {
