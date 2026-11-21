@@ -159,9 +159,17 @@ function recusar(d) {
       return { status: 'erro', msg: 'Já existe um cadastro seu em andamento ou publicado. Para retirá-lo, escreva para ' + EMAIL_ASCOM + '.' };
     }
     if (sit !== 'recusou') {
+      const email = limpar(d.email, 120).toLowerCase();
+      if (!/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.unifesspa\.edu\.br$/.test(email)) {
+        return { status: 'erro', msg: 'Informe um e-mail institucional válido para confirmar sua resposta.' };
+      }
       const sh = abaCadastros();
-      const linha = { id: Utilities.getUuid().replace(/-/g, '').slice(0, 12), criado_em: new Date().toISOString(),
-        siape: siape, nome: doc.nome, unidade: doc.unidade, status: 'recusou' };
+      const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+      const agora = new Date();
+      const linha = { id: Utilities.getUuid().replace(/-/g, '').slice(0, 12), criado_em: agora.toISOString(),
+        siape: siape, nome: doc.nome, unidade: doc.unidade, status: 'aguardando_email_recusa', email: email,
+        token: token, token_expira: new Date(agora.getTime() + 48 * 3600 * 1000).toISOString() };
+      enviarLinkDeConfirmacao(email, doc.nome, token, true);
       sh.appendRow(COLUNAS.map(function (c) { return textoSeguro(linha[c] || ''); }));
     }
   } finally { lock.releaseLock(); }
@@ -178,11 +186,13 @@ function confirmarEmail(token) {
     const rows = lerCadastros(sh);
     const r = rows.filter(function (x) { return x.token && x.token === token; })[0];
     if (!r) return { ok: false, msg: 'Link inválido ou já utilizado.' };
-    if (r.status !== 'aguardando_email') return { ok: false, msg: 'Este link já foi utilizado.' };
+    if (r.status !== 'aguardando_email' && r.status !== 'aguardando_email_recusa') return { ok: false, msg: 'Este link já foi utilizado.' };
     if (new Date(r.token_expira).getTime() < Date.now()) return { ok: false, msg: 'O link expirou. Preencha o formulário novamente.' };
-    atualizarLinha(sh, r._linha, { status: 'aguardando_ascom', token: '', token_expira: '' });
-    nome = r.nome;
+    const recusa = r.status === 'aguardando_email_recusa';
+    atualizarLinha(sh, r._linha, { status: recusa ? 'recusou' : 'aguardando_ascom', token: '', token_expira: '' });
+    nome = recusa ? '' : r.nome;
   } finally { lock.releaseLock(); }
+  if (!nome) return { ok: true, msg: 'Sua resposta foi confirmada. Você não será incluído no Banco de fontes.' };
   try {
     MailApp.sendEmail({ to: EMAIL_ASCOM, subject: '[Banco de fontes] Novo cadastro para aprovar',
       body: 'O cadastro de ' + nome + ' confirmou o e-mail e aguarda aprovação no painel da ASCOM.' });
@@ -359,7 +369,7 @@ function buscarSigaa(siape) {
 function situacaoDeLista(siape, rows) {
   const meus = rows.filter(function (r) { return r.siape === siape; });
   if (meus.some(function (r) { return r.status === 'aprovado'; })) return 'cadastrado';
-  if (meus.some(function (r) { return r.status === 'aguardando_email' || r.status === 'aguardando_ascom'; })) return 'pendente';
+  if (meus.some(function (r) { return r.status === 'aguardando_email' || r.status === 'aguardando_email_recusa' || r.status === 'aguardando_ascom'; })) return 'pendente';
   if (meus.some(function (r) { return r.status === 'recusou'; })) return 'recusou';
   return 'novo';
 }
@@ -368,14 +378,14 @@ function situacaoDoSiape(siape) {
   return situacaoDeLista(siape, lerCadastros(abaCadastros()).filter(function (r) { return r.siape === siape; }));
 }
 
-function enviarLinkDeConfirmacao(email, nome, token) {
+function enviarLinkDeConfirmacao(email, nome, token, recusa) {
   const link = ScriptApp.getService().getUrl() + '?acao=confirmar&t=' + token;
   MailApp.sendEmail({
     to: email, name: 'Banco de fontes Unifesspa', replyTo: EMAIL_ASCOM,
-    subject: 'Confirme seu cadastro no Banco de fontes da Unifesspa',
-    body: 'Olá,\n\nRecebemos um cadastro no Banco de fontes da Unifesspa em nome de ' + nome + '.\n\n' +
+    subject: recusa ? 'Confirme sua resposta ao Banco de fontes da Unifesspa' : 'Confirme seu cadastro no Banco de fontes da Unifesspa',
+    body: 'Olá,\n\nRecebemos ' + (recusa ? 'uma resposta de não participação' : 'um cadastro') + ' no Banco de fontes da Unifesspa em nome de ' + nome + '.\n\n' +
       'Para confirmar que foi você, abra o link abaixo (válido por 48 horas):\n' + link + '\n\n' +
-      'Depois da confirmação, a ASCOM revisa o cadastro antes de publicar. Telefone e e-mail não aparecem no site.\n\n' +
+      (recusa ? 'Depois da confirmação, registraremos sua decisão de não participar.\n\n' : 'Depois da confirmação, a ASCOM revisa o cadastro antes de publicar. Telefone e e-mail não aparecem no site.\n\n') +
       'Se não foi você, ignore esta mensagem. Nada será publicado.\n\nASCOM Unifesspa'
   });
 }
