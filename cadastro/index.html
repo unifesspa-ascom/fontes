@@ -591,11 +591,13 @@ desenharFoto();
 function definirDisponibilidade(radio) {
   const secao = $('secao-cadastro');
   if (radio.value === 'sim') {
+    $('campo-email-recusa').style.display = 'none';
     secao.style.display = 'block';
     $('msg-recusa').style.display = 'none';
     if (formacaoCount === 0) adicionarFormacao('Graduação');
     setTimeout(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   } else {
+    secao.style.display = 'none';
     $('campo-email-recusa').style.display = 'block';
     $('campo-email-recusa').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
