@@ -298,6 +298,21 @@
       </div>
     </div>
 
+    <div class="card" id="reenvio-card">
+      <h2>Não recebeu o e-mail de confirmação?</h2>
+      <p class="hint">Confira a caixa de spam. Se precisar, solicite um novo link informando o mesmo SIAPE e e-mail utilizados no envio.</p>
+      <div class="field-group">
+        <label for="reenvio-siape">SIAPE</label>
+        <input id="reenvio-siape" inputmode="numeric" autocomplete="off" placeholder="Seu SIAPE">
+      </div>
+      <div class="field-group">
+        <label for="reenvio-email">E-mail institucional</label>
+        <input id="reenvio-email" type="email" autocomplete="email" placeholder="nome@unifesspa.edu.br">
+      </div>
+      <button type="button" class="btn-lookup" id="btn-reenviar" onclick="solicitarReenvio()">Reenviar confirmação</button>
+      <p id="reenvio-resultado" role="status" aria-live="polite"></p>
+    </div>
+
     <!-- PASSO 3: Dados do cadastro -->
     <div id="secao-cadastro">
 
@@ -448,6 +463,23 @@ function chamar(dados) {
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(dados)
   }).then(r => r.json());
+}
+
+function solicitarReenvio() {
+  const siape = $('reenvio-siape').value.replace(/\D/g, '');
+  const email = $('reenvio-email').value.trim().toLowerCase();
+  const resultado = $('reenvio-resultado');
+  if (siape.length < 6 || siape.length > 8 || !emailValido(email)) {
+    resultado.textContent = 'Informe um SIAPE e e-mail institucional válidos.';
+    return;
+  }
+  const btn = $('btn-reenviar');
+  btn.disabled = true;
+  resultado.textContent = 'Solicitando novo link...';
+  chamar({ acao: 'reenviar', siape, email })
+    .then(r => { resultado.textContent = r.msg || (r.status === 'ok' ? 'Solicitação recebida.' : 'Não foi possível enviar agora.'); })
+    .catch(() => { resultado.textContent = 'Falha de conexão. Tente novamente.'; })
+    .finally(() => { btn.disabled = false; });
 }
 
 // ─── Busca SIAPE (conferida no servidor) ───────────────────────────────────
