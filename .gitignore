@@ -1,0 +1,12 @@
+# Dados internos de docentes e exportações locais
+/dados/docentes-sigaa.json
+/dados/*sigaa*.csv
+/dados/*sigaa*.xlsx
+/dados/*siape*.json
+/dados/*siape*.csv
+/dados/*siape*.xlsx
+*.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
