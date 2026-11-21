@@ -289,6 +289,12 @@
           <label><input type="radio" name="disponivel" value="sim" onchange="definirDisponibilidade(this)"> Sim, estou disponível</label>
           <label><input type="radio" name="disponivel" value="nao" onchange="definirDisponibilidade(this)"> Não, por enquanto não</label>
         </div>
+        <div class="field-group" id="campo-email-recusa" style="display:none;margin-top:1rem">
+          <label for="email-recusa">E-mail institucional para confirmar a resposta</label>
+          <input type="email" id="email-recusa" autocomplete="email" placeholder="nome@unifesspa.edu.br">
+          <p class="hint">Sua decisão só será registrada após confirmar o link enviado ao e-mail.</p>
+          <button type="button" class="btn-lookup" onclick="registrarRecusa()">Enviar confirmação</button>
+        </div>
       </div>
     </div>
 
@@ -590,13 +596,16 @@ function definirDisponibilidade(radio) {
     if (formacaoCount === 0) adicionarFormacao('Graduação');
     setTimeout(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   } else {
-    registrarRecusa();
+    $('campo-email-recusa').style.display = 'block';
+    $('campo-email-recusa').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 
 function registrarRecusa() {
   if (!docenteAtual) return;
-  chamar({ acao: 'recusa', siape: docenteAtual.siape, site: $('site').value })
+  const email = $('email-recusa').value.trim().toLowerCase();
+  if (!emailValido(email)) { alert('Informe um e-mail institucional válido.'); return; }
+  chamar({ acao: 'recusa', siape: docenteAtual.siape, email: email, site: $('site').value })
     .then(r => {
       if (r.status !== 'ok') {
         alert(r.msg || 'Não foi possível registrar a resposta.');
@@ -605,6 +614,7 @@ function registrarRecusa() {
       }
       $('form-container').style.display = 'none';
       $('msg-recusa').style.display = 'block';
+      $('msg-recusa').textContent = 'Enviamos um link para seu e-mail institucional. Confirme a mensagem em até 48 horas para registrar sua decisão.';
     })
     .catch(() => {
       alert('Falha de conexão. Tente novamente.');
