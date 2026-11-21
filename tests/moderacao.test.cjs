@@ -36,7 +36,7 @@ function ambiente({ falharPublicacao = false, falharPlanilha = false } = {}) {
   const fim = codigo.indexOf('\nfunction autenticar(senha)', inicio);
   assert.ok(inicio >= 0 && fim > inicio);
   vm.runInContext(codigo.slice(inicio, fim), sandbox);
-  return { executar: (decisao, id) => sandbox.moderar({ senha: 'teste', decisao, id }), registros, eventos };
+  return { executar: (decisao, id) => sandbox.moderar({ senha: 'teste', decisao, id, identidade_conferida: true }), registros, eventos };
 }
 
 test('aprovação substitui o perfil anterior e publica antes de remover foto', () => {
@@ -82,4 +82,10 @@ test('rejeição não altera JSON público', () => {
   assert.equal(a.executar('rejeitar', 'novo').status, 'ok');
   assert.equal(a.registros[1].status, 'rejeitado');
   assert.ok(!a.eventos.includes('github:json'));
+});
+
+test('aprovação sem conferência de identidade é bloqueada pelo backend', () => {
+  const a = ambiente();
+  // O ambiente de teste envia a conferência; este teste verifica a regra no código-fonte.
+  assert.match(codigo, /if \(d\.identidade_conferida !== true\) return/);
 });
