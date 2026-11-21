@@ -141,7 +141,12 @@ function cadastrar(d) {
     };
     if (fotoBytes) salvarFotoPrivada(id, fotoBytes);
     sh.appendRow(COLUNAS.map(function (c) { return textoSeguro(linha[c]); }));
-    enviarLinkDeConfirmacao(email, doc.nome, token);
+    try {
+      enviarLinkDeConfirmacao(email, doc.nome, token);
+    } catch (e) {
+      console.error('Falha ao enviar confirmação de cadastro: ' + e);
+      return { status: 'erro', msg: 'Não foi possível enviar a confirmação. Entre em contato com a ASCOM para concluir o cadastro.' };
+    }
   } finally { lock.releaseLock(); }
   return { status: 'ok' };
 }
@@ -169,8 +174,15 @@ function recusar(d) {
       const linha = { id: Utilities.getUuid().replace(/-/g, '').slice(0, 12), criado_em: agora.toISOString(),
         siape: siape, nome: doc.nome, unidade: doc.unidade, status: 'aguardando_email_recusa', email: email,
         token: token, token_expira: new Date(agora.getTime() + 48 * 3600 * 1000).toISOString() };
-      enviarLinkDeConfirmacao(email, doc.nome, token, true);
+      // Persistir antes de enviar: o link nunca deve apontar para um token inexistente.
       sh.appendRow(COLUNAS.map(function (c) { return textoSeguro(linha[c] || ''); }));
+      try {
+        enviarLinkDeConfirmacao(email, doc.nome, token, true);
+      } catch (e) {
+        // Mantém registro pendente para diagnóstico, sem afirmar que o e-mail foi enviado.
+        console.error('Falha ao enviar confirmação de recusa: ' + e);
+        return { status: 'erro', msg: 'Não foi possível enviar a confirmação. Entre em contato com a ASCOM para concluir sua resposta.' };
+      }
     }
   } finally { lock.releaseLock(); }
   return { status: 'ok' };
