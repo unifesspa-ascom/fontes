@@ -15,7 +15,7 @@
  * FLUXO
  *   1. Docente informa o SIAPE. O servidor confere na aba SIGAA (nome e unidade vêm da planilha, não do navegador).
  *   2. Docente envia o formulário com e-mail @unifesspa.edu.br. Recebe um link de confirmação.
- *   3. Ao clicar no link, o cadastro vai para a ASCOM (status aguardando_ascom).
+ *   3. O link abre uma página; ao confirmar pelo botão, o cadastro vai para a ASCOM.
  *   4. A ASCOM aprova no painel. Só então o cartão é publicado no GitHub, sem SIAPE, e-mail ou telefone.
  */
 
@@ -235,7 +235,7 @@ function reenviarConfirmacao(d) {
 
 function confirmarEmail(token) {
   if (!limitarIdentificador('conf', token, 5, 600)) return { ok: false, msg: 'Muitas tentativas. Tente novamente em alguns minutos.' };
-  if (token.length < 32) return { ok: false, msg: 'Link inválido.' };
+  if (!/^[a-f0-9]{64}$/i.test(String(token || ''))) return { ok: false, msg: 'Link inválido.' };
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   let nome = '';
   try {
