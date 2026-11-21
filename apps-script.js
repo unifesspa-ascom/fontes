@@ -73,7 +73,7 @@ function resp(obj) {
 // ───────────────────────── Ações públicas ─────────────────────────
 
 function verificar(d) {
-  if (!limitar('ver', 60, 600)) return { status: 'erro', msg: 'Muitas consultas. Tente novamente em alguns minutos.' };
+  if (!limitarIdentificador('ver', d.siape, 15, 600)) return { status: 'erro', msg: 'Muitas consultas. Tente novamente em alguns minutos.' };
   const siape = soDigitos(d.siape);
   const doc = siape.length >= 6 && siape.length <= 8 ? buscarSigaa(siape) : null;
   if (!doc) return { status: 'erro', msg: 'SIAPE não encontrado. Confira o número ou fale com a ASCOM.' };
@@ -82,7 +82,7 @@ function verificar(d) {
 
 function cadastrar(d) {
   if (d.site) return { status: 'ok' }; // campo isca preenchido por robôs
-  if (!limitar('cad', 30, 600)) return { status: 'erro', msg: 'Muitos envios. Tente novamente em alguns minutos.' };
+  if (!limitarIdentificador('cad', d.siape, 5, 600)) return { status: 'erro', msg: 'Muitos envios. Tente novamente em alguns minutos.' };
 
   const siape = soDigitos(d.siape);
   const doc = siape ? buscarSigaa(siape) : null;
@@ -154,7 +154,7 @@ function cadastrar(d) {
 
 function recusar(d) {
   if (d.site) return { status: 'ok' };
-  if (!limitar('rec', 30, 600)) return { status: 'erro', msg: 'Muitos envios. Tente novamente em alguns minutos.' };
+  if (!limitarIdentificador('rec', d.siape, 5, 600)) return { status: 'erro', msg: 'Muitos envios. Tente novamente em alguns minutos.' };
   const siape = soDigitos(d.siape);
   const doc = siape ? buscarSigaa(siape) : null;
   if (!doc) return { status: 'erro', msg: 'SIAPE não encontrado.' };
@@ -203,7 +203,7 @@ function reenviarConfirmacao(d) {
   if (siape.length < 6 || siape.length > 8 || !emailInstitucionalValido(email)) {
     return { status: 'erro', msg: 'Informe SIAPE e e-mail institucional válidos.' };
   }
-  if (!limitar('reenviar', 20, 600)) return { status: 'erro', msg: 'Muitas solicitações. Tente novamente mais tarde.' };
+  if (!limitarIdentificador('reenviar', siape, 3, 600)) return { status: 'erro', msg: 'Muitas solicitações. Tente novamente mais tarde.' };
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     const sh = abaCadastros();
@@ -234,7 +234,7 @@ function reenviarConfirmacao(d) {
 }
 
 function confirmarEmail(token) {
-  if (!limitar('conf', 60, 600)) return { ok: false, msg: 'Muitas tentativas. Tente novamente em alguns minutos.' };
+  if (!limitarIdentificador('conf', token, 5, 600)) return { ok: false, msg: 'Muitas tentativas. Tente novamente em alguns minutos.' };
   if (token.length < 32) return { ok: false, msg: 'Link inválido.' };
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   let nome = '';
@@ -486,6 +486,20 @@ function paginaConfirmacao(r) {
   t.titulo = r.ok ? 'Cadastro confirmado' : 'Não foi possível confirmar';
   t.msg = r.msg;
   return t.evaluate().setTitle('Banco de fontes Unifesspa');
+}
+
+/** Limite por identificador, sem armazenar SIAPE, e-mail ou token em texto no cache.
+ * Não equivale a proteção por IP: o Apps Script público não oferece IP confiável.
+ */
+function limitarIdentificador(acao, identificador, max, janelaSeg) {
+  const texto = String(identificador || '').trim().toLowerCase();
+  if (!texto || texto.length > 200) return false;
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, acao + ':' + texto);
+  const chave = 'lim_id_' + Utilities.base64EncodeWebSafe(bytes).slice(0, 40);
+  const cache = CacheService.getScriptCache();
+  const n = Number(cache.get(chave) || 0) + 1;
+  cache.put(chave, String(n), janelaSeg);
+  return n <= max;
 }
 
 function limitar(chave, max, janelaSeg) {
