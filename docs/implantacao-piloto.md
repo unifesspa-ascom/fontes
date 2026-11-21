@@ -26,8 +26,8 @@
 
 ## Limitações conhecidas / bloqueadores
 - O Apps Script público não oferece IP confiável: limites por identificador não substituem proteção contra ataques distribuídos ou enumeração de SIAPEs.
-- A senha administrativa compartilhada ainda permite bloqueio global após falhas repetidas; substituir por autenticação institucional quando viável.
-- Links de confirmação por GET podem ser acessados por verificadores automáticos de e-mail; idealmente exigir uma ação explícita em uma página intermediária antes de consumir o token.
+- O bloqueio global de senha foi removido para evitar indisponibilidade causada por terceiros, mas a limitação por tentativa incorreta é insuficiente contra força bruta distribuída. A senha compartilhada deve ser substituída por autenticação institucional quando viável.
+- A confirmação agora exige clique explícito em uma página intermediária; verificar seu funcionamento no Apps Script real, inclusive em clientes de e-mail institucionais.
 - O backend não prova automaticamente a correspondência SIAPE/e-mail.
 - Publicação GitHub + planilha não é transação atômica. Recuperação e reconciliação manual permanecem necessárias em falhas excepcionais.
 - Fotos removidas do branch podem permanecer no histórico Git e caches externos.
