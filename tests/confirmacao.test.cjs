@@ -29,6 +29,7 @@ test('reenvio não revela existência de cadastro e só envia para correspondên
     soDigitos: v => String(v).replace(/\D/g, ''),
     limpar: v => String(v),
     limitar: () => true,
+    limitarIdentificador: () => true,
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     abaCadastros: () => ({}), lerCadastros: () => registros,
     atualizarLinha: (_sh, _linha, campos) => Object.assign(registros[0], campos),
