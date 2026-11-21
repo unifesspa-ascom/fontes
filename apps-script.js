@@ -337,16 +337,16 @@ function moderar(d) {
 }
 
 function autenticar(senha) {
-  const cache = CacheService.getScriptCache();
-  if (Number(cache.get('falhas') || 0) >= 5) return { status: 'erro', msg: 'Muitas tentativas. Aguarde 15 minutos.' };
   const certa = PropertiesService.getScriptProperties().getProperty('SENHA_ASCOM') || '';
   if (certa.length < 10) return { status: 'erro', msg: 'Senha do painel ainda não configurada no servidor.' };
-  if (!iguais(String(senha || ''), certa)) {
-    cache.put('falhas', String(Number(cache.get('falhas') || 0) + 1), 900);
-    return { status: 'erro', msg: 'Senha incorreta.' };
+  const tentativa = String(senha || '');
+  if (iguais(tentativa, certa)) return null;
+  // Não bloquear toda a ASCOM por erros de terceiros. Penalizar apenas a
+  // mesma tentativa incorreta; não é substituto para SSO ou proteção de borda.
+  if (!limitarIdentificador('senha_incorreta', tentativa || '(vazia)', 5, 900)) {
+    return { status: 'erro', msg: 'Muitas tentativas com esta senha. Aguarde 15 minutos.' };
   }
-  cache.remove('falhas');
-  return null;
+  return { status: 'erro', msg: 'Senha incorreta.' };
 }
 
 // ───────────────────────── Publicação no GitHub ─────────────────────────
