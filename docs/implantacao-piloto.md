@@ -14,6 +14,17 @@
 4. Se a URL mudar, atualizar `APPS_SCRIPT_URL` nas páginas públicas e administrativas.
 5. Testar primeiro com dados controlados, sem enviar convites em massa.
 
+## Ensaio sem dados pessoais reais
+1. Criar uma cópia **privada** da planilha, em conta institucional, com uma aba `SIGAA` contendo somente um docente fictício e um SIAPE fictício de 6 a 8 dígitos.
+2. Criar uma cópia de teste do projeto Apps Script vinculada à planilha de ensaio, com propriedades separadas. Não apontar o teste para a planilha real nem para a implantação atual.
+3. Para não modificar o catálogo público, usar um repositório de teste institucional e ajustar `GITHUB_REPO` nessa cópia de ensaio. Não usar o token de produção.
+4. Implantar a cópia como aplicativo web de teste, conferir a URL e fazer uma consulta de SIAPE fictício.
+5. Para testar o e-mail, usar somente uma caixa institucional autorizada; verificar envio, página intermediária, clique, expiração e reenvio. Não criar endereços inexistentes.
+6. Verificar no painel de teste se a aprovação exige conferência de identidade; aprovar e retirar o perfil fictício, conferindo o JSON e as fotos no repositório de teste.
+7. Registrar resultados e limpar os dados de ensaio. Só depois avaliar a implantação na instância real.
+
+**Atenção:** um SIAPE fictício associado a um e-mail real permite exercitar o mecanismo, mas não valida a correspondência de identidade real. Essa conferência permanece uma tarefa da ASCOM.
+
 ## Critérios de aceite
 - Consulta de SIAPE, cadastro e recusa respondem corretamente.
 - Link recebido no e-mail institucional; confirmação altera estado uma única vez.
