@@ -62,7 +62,7 @@ function doPost(e) {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (p.acao === 'confirmar' && p.t) return paginaConfirmacao(confirmarEmail(String(p.t)));
+  if (p.acao === 'confirmar' && p.t) return paginaConfirmacao(String(p.t));
   return resp({ status: 'ok', msg: 'Banco de fontes Unifesspa.' });
 }
 
@@ -476,16 +476,31 @@ function enviarLinkDeConfirmacao(email, nome, token, recusa) {
   });
 }
 
-function paginaConfirmacao(r) {
+/** A visita GET apenas exibe a página: não modifica a planilha nem consome token. */
+function paginaConfirmacao(token) {
   const t = HtmlService.createTemplate(
     '<!DOCTYPE html><html lang="pt-BR"><head><base target="_top"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<style>body{font-family:system-ui,sans-serif;background:#edefec;margin:0;display:grid;place-items:center;min-height:100vh}' +
     'main{background:#fffffc;max-width:460px;margin:16px;padding:28px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)}' +
-    'h1{font-size:1.25rem;margin:0 0 8px;color:#14763c}p{margin:0;color:#333;line-height:1.5}</style></head><body><main>' +
-    '<h1><?= titulo ?></h1><p><?= msg ?></p></main></body></html>');
-  t.titulo = r.ok ? 'Cadastro confirmado' : 'Não foi possível confirmar';
-  t.msg = r.msg;
-  return t.evaluate().setTitle('Banco de fontes Unifesspa');
+    'h1{font-size:1.25rem;margin:0 0 8px;color:#14763c}p{color:#333;line-height:1.5}' +
+    'button{background:#14763c;color:white;border:0;border-radius:8px;padding:12px 18px;font:inherit;cursor:pointer}' +
+    'button:disabled{opacity:.6;cursor:wait}</style></head><body><main>' +
+    '<h1>Confirme sua resposta</h1>' +
+    '<p>Para confirmar seu e-mail institucional e encaminhar sua resposta à ASCOM, clique no botão abaixo.</p>' +
+    '<button id="confirmar" type="button">Confirmar minha resposta</button>' +
+    '<p id="resultado" role="status" aria-live="polite"></p>' +
+    '<script>const token = <?!= tokenJson ?>;' +
+    'document.getElementById("confirmar").addEventListener("click",function(){' +
+    'const botao=this,resultado=document.getElementById("resultado");botao.disabled=true;' +
+    'resultado.textContent="Confirmando...";' +
+    'google.script.run.withSuccessHandler(function(r){resultado.textContent=r.msg;' +
+    'if(!r.ok)botao.disabled=false;else botao.hidden=true;})' +
+    '.withFailureHandler(function(){resultado.textContent="Não foi possível confirmar. Tente novamente.";' +
+    'botao.disabled=false;}).confirmarEmail(token);' +
+    '});<\\/script></main></body></html>');
+  // Serialização segura para contexto JavaScript dentro do HTML.
+  t.tokenJson = JSON.stringify(String(token || '')).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
+  return t.evaluate().setTitle('Confirmação — Banco de fontes Unifesspa');
 }
 
 /** Limite por identificador, sem armazenar SIAPE, e-mail ou token em texto no cache.
