@@ -497,7 +497,7 @@ function paginaConfirmacao(token) {
     'if(!r.ok)botao.disabled=false;else botao.hidden=true;})' +
     '.withFailureHandler(function(){resultado.textContent="Não foi possível confirmar. Tente novamente.";' +
     'botao.disabled=false;}).confirmarEmail(token);' +
-    '});<\\/script></main></body></html>');
+    '});</script></main></body></html>');
   // Serialização segura para contexto JavaScript dentro do HTML.
   t.tokenJson = JSON.stringify(String(token || '')).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
   return t.evaluate().setTitle('Confirmação — Banco de fontes Unifesspa');
