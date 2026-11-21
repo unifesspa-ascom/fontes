@@ -242,24 +242,52 @@ function moderar(d) {
     const r = rows.filter(function (x) { return x.id === String(d.id || ''); })[0];
     if (!r) return { status: 'erro', msg: 'Cadastro não encontrado.' };
     const agora = new Date().toISOString();
+    const antigos = rows.filter(function (x) { return x.siape === r.siape && x.status === 'aprovado' && x.id !== r.id; });
+    const alteracoes = [];
     if (decisao === 'aprovar') {
       if (r.status !== 'aguardando_ascom') return { status: 'erro', msg: 'Só é possível aprovar cadastros com e-mail confirmado.' };
-      rows.forEach(function (x) {
-        if (x.siape === r.siape && x.status === 'aprovado') { atualizarLinha(sh, x._linha, { status: 'substituido' }); removerFotoGitHub(x); }
-      });
-      atualizarLinha(sh, r._linha, { status: 'aprovado', moderado_em: agora });
-      publicarFoto(r);
+      antigos.forEach(function (x) { alteracoes.push({ registro: x, novo: { status: 'substituido' } }); });
+      alteracoes.push({ registro: r, novo: { status: 'aprovado', moderado_em: agora } });
     } else if (decisao === 'rejeitar') {
       if (r.status !== 'aguardando_ascom') return { status: 'erro', msg: 'Só é possível rejeitar cadastros que aguardam a ASCOM.' };
-      atualizarLinha(sh, r._linha, { status: 'rejeitado', moderado_em: agora });
+      alteracoes.push({ registro: r, novo: { status: 'rejeitado', moderado_em: agora } });
     } else {
       if (r.status !== 'aprovado') return { status: 'erro', msg: 'Só é possível retirar cadastros publicados.' };
-      atualizarLinha(sh, r._linha, { status: 'retirado', moderado_em: agora });
-      removerFotoGitHub(r);
+      alteracoes.push({ registro: r, novo: { status: 'retirado', moderado_em: agora } });
     }
-    if (decisao !== 'rejeitar') publicarNoGitHub();
+
+    // Fotos novas precisam existir antes de o JSON público apontar para elas.
+    // Fotos antigas só são removidas depois da publicação do JSON atualizado.
+    if (decisao === 'aprovar') publicarFoto(r);
+    const aplicadas = [];
+    try {
+      alteracoes.forEach(function (a) {
+        const anterior = {};
+        Object.keys(a.novo).forEach(function (campo) { anterior[campo] = a.registro[campo]; });
+        // Guardar o snapshot ANTES de escrever, inclusive para falhas parciais.
+        aplicadas.push({ registro: a.registro, anterior: anterior });
+        atualizarLinha(sh, a.registro._linha, a.novo);
+      });
+      if (decisao !== 'rejeitar') publicarNoGitHub();
+    } catch (e) {
+      // Se o GitHub falhar, restaurar o estado anterior da planilha.
+      let falhouRollback = false;
+      aplicadas.reverse().forEach(function (a) {
+        try { atualizarLinha(sh, a.registro._linha, a.anterior); }
+        catch (rollbackError) { falhouRollback = true; console.error('Rollback de cadastro falhou: ' + rollbackError); }
+      });
+      if (falhouRollback) {
+        console.error('ATENÇÃO: moderação exige reconciliação manual com o JSON público. Erro original: ' + e);
+        return { status: 'erro', msg: 'Não foi possível concluir a operação e a recuperação automática falhou. Contate o administrador antes de tentar novamente.' };
+      }
+      console.error('Moderação não publicada, planilha restaurada: ' + e);
+      return { status: 'erro', msg: 'Não foi possível concluir a publicação. Nenhuma alteração de status foi mantida; tente novamente mais tarde.' };
+    }
+    // Limpeza de fotos é secundária: não pode desfazer uma aprovação já publicada.
+    if (decisao === 'aprovar') antigos.forEach(removerFotoGitHub);
+    if (decisao === 'retirar') removerFotoGitHub(r);
+    return { status: 'ok' };
   } finally { lock.releaseLock(); }
-  return { status: 'ok' };
 }
 
 function autenticar(senha) {
