@@ -1,0 +1,34 @@
+{
+  "ficticio": true,
+  "aviso": "Registro fictício de prévia; não representa docente real.",
+  "total": 1,
+  "gerado_em": "2026-11-22T00:00:00Z",
+  "docentes": [
+    {
+      "id": "preview-9999999",
+      "ficticio": true,
+      "nome": "Professora Teste",
+      "unidade": "Instituto de Testes",
+      "campus": "Marabá (Campus Sede)",
+      "resumo": "Professora fictícia utilizada exclusivamente para testar o Banco de Fontes da Unifesspa.",
+      "temas": [
+        "Educação",
+        "Comunicação"
+      ],
+      "formatos": [
+        "E-mail"
+      ],
+      "lattes": "",
+      "formacoes": [
+        {
+          "nivel": "Doutorado",
+          "curso": "Educação",
+          "instituicao": "Universidade de Testes",
+          "ano": "2020"
+        }
+      ],
+      "foto": "",
+      "atualizado": "2026-11-22T00:00:00Z"
+    }
+  ]
+}
