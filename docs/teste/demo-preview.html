@@ -141,14 +141,14 @@
 
 <header class="topo">
   <div class="topo-in">
-    <a class="logo" href="../" aria-label="Unifesspa ASCOM">
-      <img src="../logo-unifesspa-ascom.png" alt="Unifesspa ASCOM" id="logo-img">
+    <a class="logo" href="https://unifesspa-ascom.github.io/fontes/" aria-label="Unifesspa ASCOM">
+      <img src="https://unifesspa-ascom.github.io/fontes/logo-unifesspa-ascom.png" alt="Unifesspa ASCOM" id="logo-img">
     </a>
     <div class="titulo">
       <h1>Banco de fontes</h1>
       <p>Docentes e pesquisadores da Unifesspa para entrevistas e análises</p>
     </div>
-    <a class="btn-participar" href="../">Ir ao banco de fontes real</a>
+    <a class="btn-participar" href="https://unifesspa-ascom.github.io/fontes/">Ir ao banco de fontes real</a>
   </div>
 </header>
 
@@ -214,7 +214,7 @@
   'use strict';
   var JSON_URL = 'https://raw.githubusercontent.com/unifesspa-ascom/fontes/fix/fluxo-cadastro-confirmacao-20261121/docs/teste/docentes-aprovados-preview.json';
   var EMAIL_ASCOM = 'ascom@unifesspa.edu.br';
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW01pH41uKNRlaGUuZdad0S18fUPw6sFqPlm5HOLWKz88flipGNyW_2Ro1sGtR356cbw/exec';
+  var APPS_SCRIPT_URL = ''; // Prévia local: não enviar métricas ou dados ao backend oficial.
   var ORIGEM = 'demo';
   var ESPERA_REGISTRO = 2000;
   var CAMPI = ['Marabá (Campus Sede)', 'Canaã dos Carajás', 'Xinguara', 'Rondon do Pará', 'São Félix do Xingu', 'Santana do Araguaia'];
@@ -419,7 +419,7 @@
       if (chave === ultimoRegistro) return;
       ultimoRegistro = chave;
       try {
-        fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+        APPS_SCRIPT_URL && fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
           body: JSON.stringify({ acao: 'buscar', termo: termo, campus: campus, formato: formato, n_resultados: ultimoN, origem: ORIGEM }) }).catch(function () {});
       } catch (e) { /* o registro nunca atrapalha a busca */ }
     };
