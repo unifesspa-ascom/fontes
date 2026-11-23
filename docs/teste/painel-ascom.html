@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>TESTE | Painel da ASCOM | Banco de fontes</title>
+<style>
+  :root { --bg:#edefec; --card:#fffffc; --texto:#1f2a24; --muted:#5d6a63; --borda:#cfd6d1; --verde:#14763c; --verde-escuro:#0e5a2d; --tag-bg:#e2f4e7; --tag-cor:#14763c; --erro:#b3261e; --sombra:0 1px 3px rgba(20,40,28,.12),0 6px 18px rgba(20,40,28,.06); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#101512; --card:#18201b; --texto:#e6ece8; --muted:#9fada5; --borda:#2f3b34; --verde:#4fbf79; --verde-escuro:#3aa563; --tag-bg:#1d3626; --tag-cor:#8be0a8; --erro:#ffb4ab; --sombra:0 1px 3px rgba(0,0,0,.5); } }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--texto); line-height:1.45; }
+  button,input,select { font:inherit; color:inherit; }
+  :focus-visible { outline:3px solid #f5c518; outline-offset:2px; }
+  header { background:var(--card); border-bottom:1px solid var(--borda); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  header h1 { font-size:1.2rem; color:var(--verde); }
+  header p { color:var(--muted); font-size:.88rem; }
+  main { max-width:1100px; margin:0 auto; padding:20px; }
+  .caixa { background:var(--card); border-radius:12px; padding:22px; box-shadow:var(--sombra); }
+  .login { max-width:380px; margin:48px auto; }
+  .login h2 { font-size:1.1rem; margin-bottom:12px; }
+  label { display:block; font-weight:600; font-size:.9rem; margin:10px 0 4px; }
+  input[type=password], input[type=search], select { width:100%; padding:11px 12px; border:1px solid var(--borda); border-radius:8px; background:var(--card); min-height:44px; }
+  .btn { border:1px solid var(--borda); background:var(--card); padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; }
+  .btn:hover { border-color:var(--verde); }
+  .btn.pri { background:var(--verde); border-color:var(--verde); color:#fff; }
+  .btn.pri:hover { background:var(--verde-escuro); }
+  .btn.perigo { color:var(--erro); }
+  .btn:disabled { opacity:.6; cursor:not-allowed; }
+  .erro { color:var(--erro); font-size:.9rem; margin-top:10px; min-height:1.2em; }
+  .abas { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .aba { border:1px solid var(--borda); background:var(--card); padding:9px 14px; border-radius:999px; cursor:pointer; font-weight:600; font-size:.9rem; }
+  .aba[aria-selected="true"] { background:var(--tag-bg); color:var(--tag-cor); border-color:var(--verde); }
+  .aba .n { opacity:.75; margin-left:4px; }
+  .lista { display:grid; gap:14px; }
+  .item { background:var(--card); border-radius:12px; padding:18px; box-shadow:var(--sombra); }
+  .item h3 { font-size:1.05rem; }
+  .item .un { color:var(--muted); font-size:.88rem; }
+  .linha { margin-top:8px; font-size:.92rem; }
+  .linha b { color:var(--muted); font-weight:600; }
+  .selo { display:inline-block; font-size:.78rem; font-weight:700; padding:2px 10px; border-radius:999px; background:var(--tag-bg); color:var(--tag-cor); margin-left:8px; vertical-align:middle; }
+  .acoes { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .barra { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .barra input { flex:1; min-width:220px; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:var(--sombra); font-size:.9rem; }
+  th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--borda); }
+  th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+  .vazio { color:var(--muted); text-align:center; padding:28px; }
+  .tabela-wrap { overflow-x:auto; }
+  .cab-item { display:flex; gap:14px; align-items:flex-start; }
+  .foto-item { flex:none; width:72px; height:96px; border-radius:8px; background:var(--tag-bg); color:var(--tag-cor); display:grid; place-items:center; font-weight:800; font-size:1.3rem; overflow:hidden; }
+  .foto-item img { width:100%; height:100%; object-fit:cover; display:block; }
+  .filtros-est { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+  .filtros-est select { width:auto; min-width:220px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px; }
+  .kpi { background:var(--card); border-radius:12px; padding:16px 18px; box-shadow:var(--sombra); }
+  .kpi .v { font-size:1.9rem; font-weight:800; color:var(--verde); line-height:1.1; }
+  .kpi .r { color:var(--muted); font-size:.85rem; margin-top:4px; }
+  .grade-est { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
+  .bloco { background:var(--card); border-radius:12px; padding:18px; box-shadow:var(--sombra); }
+  .bloco h3 { font-size:1rem; margin-bottom:4px; }
+  .bloco .nota { color:var(--muted); font-size:.82rem; margin-bottom:12px; }
+  .barra-l { display:grid; grid-template-columns:minmax(90px,38%) 1fr 34px; gap:10px; align-items:center; font-size:.88rem; margin:6px 0; }
+  .barra-l .rot { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .barra-l .trilho { background:var(--bg); border-radius:4px; height:14px; overflow:hidden; }
+  .barra-l .preen { background:var(--verde); height:100%; border-radius:4px; min-width:2px; }
+  .barra-l .preen.alerta { background:#b26a00; }
+  .barra-l .num { text-align:right; font-variant-numeric:tabular-nums; font-weight:700; }
+  .dias { display:flex; align-items:flex-end; gap:3px; height:120px; border-bottom:1px solid var(--borda); }
+  .dias .col { flex:1; background:var(--verde); border-radius:3px 3px 0 0; min-height:2px; }
+  .dias-eixo { display:flex; justify-content:space-between; color:var(--muted); font-size:.78rem; margin-top:4px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div role="status" style="background:#fff3cd;color:#5c4100;padding:12px;text-align:center;font:700 15px Arial,sans-serif;border-bottom:2px solid #d49b00">AMBIENTE DE TESTE — consulta administrativa. Aprovação e publicação desativadas nesta cópia.</div>
+<header>
+  <div><h1>Painel da ASCOM</h1><p>Banco de fontes da Unifesspa. Uso interno, com dados de contato.</p></div>
+  <button class="btn" id="sair" hidden>Sair</button>
+</header>
+<main>
+  <form class="caixa login" id="login" autocomplete="off">
+    <h2>Entrar</h2>
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" autocomplete="current-password" required>
+    <p class="erro" id="erro-login" role="alert"></p>
+    <button class="btn pri" id="entrar" type="submit" style="width:100%;margin-top:8px">Entrar</button>
+  </form>
+
+  <section id="app" hidden>
+    <div class="abas" id="abas" role="tablist"></div>
+    <div id="conteudo"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1gS7YD27skORPolGQaFkKKpC7fHAJLir8mBE5UpnPaCVHb5fmKJ9GpnebpRkE9Yb9/exec';
+  var $ = function (id) { return document.getElementById(id); };
+  var senha = '';       // só em memória; recarregar a página exige entrar de novo
+  var dados = null;
+  var aba = 'aprovar';
+
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function norm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function seguroHref(u) { try { var x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch (e) { return ''; } }
+  function dt(iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }); }
+
+  function chamar(corpo) {
+    corpo.senha = senha;
+    return fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(corpo) }).then(function (r) { return r.json(); });
+  }
+
+  $('login').addEventListener('submit', function (e) {
+    e.preventDefault();
+    senha = $('senha').value;
+    $('erro-login').textContent = '';
+    $('entrar').disabled = true;
+    carregar().then(function (ok) {
+      $('entrar').disabled = false;
+      if (ok) { $('senha').value = ''; $('login').hidden = true; $('app').hidden = false; $('sair').hidden = false; desenhar(); }
+      else senha = '';
+    });
+  });
+  $('sair').addEventListener('click', function () { senha = ''; dados = null; location.reload(); });
+
+  function carregar() {
+    return chamar({ acao: 'painel' }).then(function (r) {
+      if (r.status !== 'ok') { $('erro-login').textContent = r.msg || 'Não foi possível entrar.'; if ($('app').hidden === false) alert(r.msg || 'Erro'); return false; }
+      dados = r; return true;
+    }).catch(function () { $('erro-login').textContent = 'Falha de conexão.'; return false; });
+  }
+
+  var ABAS = [
+    { id: 'aprovar', nome: 'Para aprovar', filtro: function (c) { return c.status === 'aguardando_ascom'; } },
+    { id: 'publicados', nome: 'Publicados', filtro: function (c) { return c.status === 'aprovado'; } },
+    { id: 'email', nome: 'Aguardando e-mail', filtro: function (c) { return c.status === 'aguardando_email'; } },
+    { id: 'recusas', nome: 'Não querem participar', filtro: function (c) { return c.status === 'recusou'; } },
+    { id: 'convite', nome: 'Ainda não responderam', filtro: null },
+    { id: 'estatisticas', nome: 'Estatísticas', filtro: null }
+  ];
+
+  function contar(a) {
+    if (a.id === 'estatisticas') return null;
+    if (a.id === 'convite') return dados.sigaa.filter(function (x) { return x.situacao === 'novo'; }).length;
+    return dados.cadastros.filter(a.filtro).length;
+  }
+
+  function desenhar() {
+    var bar = $('abas'); bar.textContent = '';
+    ABAS.forEach(function (a) {
+      var b = el('button', 'aba'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', a.id === aba ? 'true' : 'false');
+      b.appendChild(document.createTextNode(a.nome)); var qtd = contar(a); if (qtd !== null) b.appendChild(el('span', 'n', '(' + qtd + ')'));
+      b.addEventListener('click', function () { aba = a.id; desenhar(); });
+      bar.appendChild(b);
+    });
+    var c = $('conteudo'); c.textContent = '';
+    if (aba === 'convite') return desenharConvite(c);
+    if (aba === 'estatisticas') return desenharEstatisticas(c);
+    var def = ABAS.filter(function (a) { return a.id === aba; })[0];
+    var itens = dados.cadastros.filter(def.filtro).sort(function (a, b) { return a.criado_em < b.criado_em ? 1 : -1; });
+    if (!itens.length) { c.appendChild(el('div', 'caixa vazio', 'Nada por aqui.')); return; }
+    var l = el('div', 'lista');
+    itens.forEach(function (i) { l.appendChild(item(i)); });
+    c.appendChild(l);
+  }
+
+  function iniciais(nome) {
+    var p = String(nome || '').replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
+    if (!p.length) return '?';
+    return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+  }
+  function fotoSegura(u) {
+    var s = String(u || '').trim();
+    if (/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s)) return s;
+    if (/^https:\/\/sigaa\.unifesspa\.edu\.br\/sigaa\/verFoto\?[A-Za-z0-9=&%_.\-]+$/.test(s)) return s;
+    if (/^fotos\/[A-Za-z0-9_-]+\.jpg$/.test(s)) return '../' + s;
+    return '';
+  }
+
+  function linha(rot, val) { var p = el('p', 'linha'); p.appendChild(el('b', null, rot + ': ')); p.appendChild(document.createTextNode(val || 'não informado')); return p; }
+
+  function item(i) {
+    var box = el('article', 'item');
+    var cab = el('div', 'cab-item');
+    var fh = fotoSegura(i.foto);
+    if (i.status !== 'recusou') {
+      var fb = el('div', 'foto-item', iniciais(i.nome));
+      if (fh) {
+        var im = document.createElement('img'); im.alt = 'Foto de ' + i.nome; im.referrerPolicy = 'no-referrer';
+        im.addEventListener('load', function () { fb.textContent = ''; fb.appendChild(im); });
+        im.src = fh;
+      }
+      cab.appendChild(fb);
+    }
+    var tit = el('div');
+    var h = el('h3', null, i.nome); if (i.status === 'aprovado') h.appendChild(el('span', 'selo', 'publicado'));
+    tit.appendChild(h);
+    tit.appendChild(el('div', 'un', [i.unidade, i.campus, 'SIAPE ' + i.siape].filter(Boolean).join(' · ')));
+    cab.appendChild(tit);
+    box.appendChild(cab);
+    if (i.status !== 'recusou') {
+      box.appendChild(linha('Apresentação', i.resumo));
+      box.appendChild(linha('Temas', i.temas));
+      box.appendChild(linha('Formatos', i.formatos));
+      box.appendChild(linha('Formação', (i.formacoes || []).map(function (f) { return f.nivel + ' em ' + f.curso + ' (' + f.instituicao + (f.ano ? ', ' + f.ano : '') + ')'; }).join('; ')));
+      var p = el('p', 'linha'); p.appendChild(el('b', null, 'E-mail (confira se combina com o nome): '));
+      p.appendChild(document.createTextNode(i.email || 'não informado')); box.appendChild(p);
+      box.appendChild(linha('WhatsApp', i.whatsapp));
+      var lh = seguroHref(i.lattes);
+      var pl = el('p', 'linha'); pl.appendChild(el('b', null, 'Lattes: '));
+      if (lh) { var a = el('a', null, lh); a.href = lh; a.target = '_blank'; a.rel = 'noopener noreferrer'; pl.appendChild(a); } else pl.appendChild(document.createTextNode('não informado'));
+      box.appendChild(pl);
+      box.appendChild(linha('Foto', ({ sigaa: 'a do SIGAA, mantida pelo docente', enviada: 'enviada pelo docente', nenhuma: 'sem foto (só iniciais)' })[i.foto_modo] || 'não informado (cadastro anterior)'));
+      box.appendChild(linha('Autorização de divulgação', i.autorizacao ? 'marcada em ' + dt(i.autorizacao) : 'não registrada (cadastro anterior à caixa de autorização)'));
+      if (i.observacao) box.appendChild(linha('Observação do docente', i.observacao));
+    }
+    box.appendChild(linha('Enviado em', dt(i.criado_em)));
+    var ac = el('div', 'acoes');
+    if (i.status === 'aguardando_ascom') {
+      ac.appendChild(botao('Aprovar e publicar (desativado no teste)', 'pri', function () { alert('Publicação desativada nesta cópia de teste.'); }));
+      ac.appendChild(botao('Rejeitar (desativado no teste)', 'perigo', function () { alert('Moderação desativada nesta cópia de teste.'); }));
+    } else if (i.status === 'aprovado') {
+      ac.appendChild(botao('Retirar do site', 'perigo', function () { decidir(i, 'retirar', 'Retirar ' + i.nome + ' do site?'); }));
+    }
+    if (ac.childNodes.length) box.appendChild(ac);
+    return box;
+  }
+
+  function botao(txt, cls, fn) { var b = el('button', 'btn ' + cls, txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
+
+  function decidir(i, decisao, pergunta) {
+    if (!confirm(pergunta)) return;
+    var identidadeConferida = false;
+    if (decisao === 'aprovar') {
+      identidadeConferida = confirm('CONFERÊNCIA OBRIGATÓRIA: você verificou, por um canal institucional independente, que o SIAPE e o e-mail informado pertencem a ' + i.nome + '? Clique OK somente após essa conferência.');
+      if (!identidadeConferida) return;
+    }
+    document.querySelectorAll('.acoes .btn').forEach(function (b) { b.disabled = true; });
+    chamar({ acao: 'moderar', id: i.id, decisao: decisao, identidade_conferida: identidadeConferida }).then(function (r) {
+      if (r.status !== 'ok') { alert(r.msg || 'Não foi possível concluir.'); }
+      return carregar();
+    }).then(function () { desenhar(); }).catch(function () { alert('Falha de conexão.'); desenhar(); });
+  }
+
+  function desenharConvite(c) {
+    var lista = dados.sigaa.filter(function (x) { return x.situacao === 'novo'; });
+    var barra = el('div', 'barra');
+    var busca = el('input'); busca.type = 'search'; busca.placeholder = 'Filtrar por nome ou unidade'; busca.setAttribute('aria-label', 'Filtrar');
+    var exp = botao('Baixar lista (CSV)', '', function () { exportar(atuais); });
+    barra.appendChild(busca); barra.appendChild(exp); c.appendChild(barra);
+    c.appendChild(el('p', 'un', 'Docentes da lista do SIGAA que ainda não se cadastraram nem disseram que não querem participar. Use para decidir quem receber o convite.'));
+    var wrap = el('div', 'tabela-wrap'); c.appendChild(wrap);
+    var atuais = lista;
+    function mostrar() {
+      var q = norm(busca.value.trim());
+      atuais = lista.filter(function (x) { return !q || norm(x.nome + ' ' + x.unidade).indexOf(q) >= 0; });
+      wrap.textContent = '';
+      var t = el('table'); var th = el('thead'); var tr = el('tr');
+      ['Nome', 'SIAPE', 'Unidade'].forEach(function (x) { tr.appendChild(el('th', null, x)); }); th.appendChild(tr); t.appendChild(th);
+      var tb = el('tbody');
+      atuais.forEach(function (x) { var r = el('tr'); [x.nome, x.siape, x.unidade].forEach(function (v) { r.appendChild(el('td', null, v)); }); tb.appendChild(r); });
+      t.appendChild(tb); wrap.appendChild(t);
+      if (!atuais.length) wrap.appendChild(el('div', 'vazio', 'Nenhum docente nesta lista.'));
+    }
+    busca.addEventListener('input', mostrar); mostrar();
+  }
+
+  // ── Estatísticas (buscas registradas e acervo publicado) ──
+  var origemSel = '';
+  var metr = null;
+  function numBR(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+  function diaBR(d) { var p = String(d).split('-'); return p.length === 3 ? p[2] + '/' + p[1] : d; }
+  function kpi(v, r) { var k = el('div', 'kpi'); k.appendChild(el('div', 'v', v)); k.appendChild(el('div', 'r', r)); return k; }
+  function bloco(titulo, nota) {
+    var b = el('section', 'bloco'); b.appendChild(el('h3', null, titulo)); if (nota) b.appendChild(el('p', 'nota', nota)); return b;
+  }
+  function barras(itens, alerta) {
+    var w = el('div'); var max = 0;
+    itens.forEach(function (x) { if (x.n > max) max = x.n; });
+    if (!itens.length) { w.appendChild(el('p', 'nota', 'Ainda sem dados.')); return w; }
+    itens.forEach(function (x) {
+      var l = el('div', 'barra-l');
+      var rot = el('span', 'rot', x.rot); rot.title = x.rot; l.appendChild(rot);
+      var tr = el('span', 'trilho'); var pr = el('span', 'preen' + (alerta ? ' alerta' : '')); pr.style.display = 'block'; pr.style.width = (max ? Math.max(1, Math.round(x.n / max * 100)) : 0) + '%'; tr.appendChild(pr); l.appendChild(tr);
+      l.appendChild(el('span', 'num', numBR(x.n)));
+      w.appendChild(l);
+    });
+    return w;
+  }
+  function deObjeto(o, topo) {
+    var a = Object.keys(o || {}).map(function (k) { return { rot: k, n: o[k] }; });
+    a.sort(function (x, y) { return y.n - x.n || x.rot.localeCompare(y.rot, 'pt-BR'); });
+    return topo ? a.slice(0, topo) : a;
+  }
+  function serieDias(porDia) {
+    var ks = Object.keys(porDia || {}).sort();
+    if (!ks.length) return [];
+    var out = [], d = new Date(ks[0] + 'T12:00:00'), fim = new Date(ks[ks.length - 1] + 'T12:00:00'), n = 0;
+    while (d <= fim && n < 90) { var k = d.toISOString().slice(0, 10); out.push({ dia: k, n: porDia[k] || 0 }); d.setDate(d.getDate() + 1); n++; }
+    return out;
+  }
+  function desenharEstatisticas(c) {
+    var f = el('div', 'filtros-est');
+    var lb = el('label', null, 'Buscas de:'); lb.style.margin = '0'; lb.setAttribute('for', 'sel-origem');
+    var sel = el('select'); sel.id = 'sel-origem';
+    [['', 'Todas (banco real e demonstração)'], ['real', 'Banco real'], ['demo', 'Banco de demonstração (dados fictícios)']].forEach(function (o) {
+      var op = el('option', null, o[1]); op.value = o[0]; if (o[0] === origemSel) op.selected = true; sel.appendChild(op);
+    });
+    var at = botao('Atualizar', '', function () { buscarMetricas(c, corpo); });
+    f.appendChild(lb); f.appendChild(sel); f.appendChild(at); c.appendChild(f);
+    var corpo = el('div'); c.appendChild(corpo);
+    sel.addEventListener('change', function () { origemSel = sel.value; buscarMetricas(c, corpo); });
+    if (metr && metr.origem === (origemSel || 'todas')) mostrarMetricas(corpo, metr); else buscarMetricas(c, corpo);
+  }
+  function buscarMetricas(c, corpo) {
+    corpo.textContent = ''; corpo.appendChild(el('div', 'caixa vazio', 'Carregando...'));
+    chamar({ acao: 'metricas', origem: origemSel }).then(function (r) {
+      corpo.textContent = '';
+      if (r.status !== 'ok') { corpo.appendChild(el('div', 'caixa vazio', r.msg || 'Não foi possível carregar as estatísticas.')); return; }
+      metr = r; mostrarMetricas(corpo, r);
+    }).catch(function () { corpo.textContent = ''; corpo.appendChild(el('div', 'caixa vazio', 'Falha de conexão.')); });
+  }
+  function mostrarMetricas(corpo, r) {
+    corpo.textContent = '';
+    var b = r.buscas || {}, a = r.acervo || {};
+    var pct = b.total ? Math.round(b.sem_resultado / b.total * 100) : 0;
+    var k = el('div', 'kpis');
+    k.appendChild(kpi(numBR(b.total), 'buscas registradas'));
+    k.appendChild(kpi(b.total ? pct + '%' : '–', 'sem nenhum resultado (' + numBR(b.sem_resultado) + ')'));
+    k.appendChild(kpi(numBR(a.total), 'fontes publicadas no banco real'));
+    k.appendChild(kpi(b.ultima ? dt(b.ultima) : '–', 'última busca'));
+    corpo.appendChild(k);
+
+    var g = el('div', 'grade-est');
+    var d = bloco('Buscas por dia', 'Cada coluna é um dia (horário de Brasília).');
+    var serie = serieDias(b.por_dia);
+    if (serie.length) {
+      var max = 0; serie.forEach(function (x) { if (x.n > max) max = x.n; });
+      var cols = el('div', 'dias'); cols.setAttribute('role', 'img'); cols.setAttribute('aria-label', 'Buscas por dia, de ' + diaBR(serie[0].dia) + ' a ' + diaBR(serie[serie.length - 1].dia));
+      serie.forEach(function (x) { var cl = el('div', 'col'); cl.style.height = (max ? Math.max(2, Math.round(x.n / max * 100)) : 2) + '%'; cl.title = diaBR(x.dia) + ': ' + x.n; cols.appendChild(cl); });
+      d.appendChild(cols);
+      var eixo = el('div', 'dias-eixo'); eixo.appendChild(el('span', null, diaBR(serie[0].dia))); eixo.appendChild(el('span', null, 'máximo em um dia: ' + max)); eixo.appendChild(el('span', null, diaBR(serie[serie.length - 1].dia))); d.appendChild(eixo);
+    } else d.appendChild(el('p', 'nota', 'Ainda sem buscas registradas.'));
+    g.appendChild(d);
+
+    var t = bloco('Assuntos mais buscados', 'Termos normalizados (sem acento, em minúsculas).');
+    t.appendChild(barras((b.mais_buscados || []).slice(0, 12).map(function (x) { return { rot: x.termo, n: x.n }; }))); g.appendChild(t);
+    var sr = bloco('Buscas sem resultado', 'Assuntos que os jornalistas procuraram e o banco não tinha. Indicam quem convidar.');
+    sr.appendChild(barras((b.sem_resultado_termos || []).slice(0, 12).map(function (x) { return { rot: x.termo, n: x.sem }; }), true)); g.appendChild(sr);
+    var bc = bloco('Buscas por campus (quando filtrado)'); bc.appendChild(barras(deObjeto(b.por_campus))); g.appendChild(bc);
+    var bf = bloco('Buscas por formato (quando filtrado)'); bf.appendChild(barras(deObjeto(b.por_formato))); g.appendChild(bf);
+    var ac = bloco('Fontes publicadas por campus', 'Apenas o banco real, cadastros aprovados.'); ac.appendChild(barras(deObjeto(a.por_campus))); g.appendChild(ac);
+    var af = bloco('Fontes por formato de atendimento', 'Apenas o banco real, cadastros aprovados.'); af.appendChild(barras(deObjeto(a.por_formato))); g.appendChild(af);
+    var at = bloco('Temas mais frequentes no acervo', 'Apenas o banco real, cadastros aprovados.');
+    at.appendChild(barras((a.temas || []).slice(0, 12).map(function (x) { return { rot: x.tema, n: x.n }; }))); g.appendChild(at);
+    corpo.appendChild(g);
+    corpo.appendChild(el('p', 'un', 'As buscas são registradas sem nenhum dado pessoal: apenas termo, filtros, número de resultados e origem (banco real ou demonstração).'));
+  }
+
+  function exportar(lista) {
+    function cel(v) { v = String(v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
+    var linhas = ['nome,siape,unidade'].concat(lista.map(function (x) { return [x.nome, x.siape, x.unidade].map(cel).join(','); }));
+    var blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'docentes-sem-resposta.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+})();
+</script>
+</body>
+</html>

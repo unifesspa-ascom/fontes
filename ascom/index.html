@@ -231,8 +231,13 @@
 
   function decidir(i, decisao, pergunta) {
     if (!confirm(pergunta)) return;
+    var identidadeConferida = false;
+    if (decisao === 'aprovar') {
+      identidadeConferida = confirm('CONFERÊNCIA OBRIGATÓRIA: você verificou, por um canal institucional independente, que o SIAPE e o e-mail informado pertencem a ' + i.nome + '? Clique OK somente após essa conferência.');
+      if (!identidadeConferida) return;
+    }
     document.querySelectorAll('.acoes .btn').forEach(function (b) { b.disabled = true; });
-    chamar({ acao: 'moderar', id: i.id, decisao: decisao }).then(function (r) {
+    chamar({ acao: 'moderar', id: i.id, decisao: decisao, identidade_conferida: identidadeConferida }).then(function (r) {
       if (r.status !== 'ok') { alert(r.msg || 'Não foi possível concluir.'); }
       return carregar();
     }).then(function () { desenhar(); }).catch(function () { alert('Falha de conexão.'); desenhar(); });

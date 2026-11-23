@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TESTE | Cadastro de docente | Banco de fontes Unifesspa</title>
+  <style>
+    :root {
+      --verde: #14763c;
+      --verde-claro: #0e5a2d;
+      --amarelo: #f5c518;
+      --bg: #edefec;
+      --card: #fffffc;
+      --texto: #212529;
+      --muted: #6c757d;
+      --borda: #dee2e6;
+      --erro: #dc3545;
+      --sucesso: #198754;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #121212;
+        --card: #1e1e1e;
+        --texto: #e0e0e0;
+        --muted: #9e9e9e;
+        --borda: #333;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--card);
+      color: var(--texto);
+      border-bottom: 1px solid var(--borda);
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+    header a { color: inherit; text-decoration: none; }
+    .voltar { display:inline-block; margin-top:.4rem; font-size:.85rem; color: var(--verde) !important; font-weight:600; }
+    header img { height: 48px; margin-bottom: 0.5rem; }
+    header h1 { font-size: 1.3rem; font-weight: 700; color: var(--verde); }
+    header p { font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem; }
+    .isca { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    #aviso-situacao { display:none; margin-top:.6rem; font-size:.85rem; color: var(--muted); }
+    main {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; color: var(--verde); margin-bottom: 1rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; }
+    label .req { color: var(--erro); }
+    input[type=text], input[type=email], input[type=tel],
+    input[type=url], input[type=number], select, textarea {
+      width: 100%; padding: 0.6rem 0.75rem;
+      border: 1.5px solid var(--borda);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--card);
+      color: var(--texto);
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--verde-claro);
+      box-shadow: 0 0 0 3px rgba(20,118,60,0.18);
+    }
+    input[readonly] { background: var(--bg); cursor: not-allowed; }
+    textarea { resize: vertical; min-height: 100px; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .field-group { margin-bottom: 1.25rem; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 500px) { .row-2 { grid-template-columns: 1fr; } }
+
+    /* SIAPE lookup */
+    .siape-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+    .siape-row input { flex: 1; }
+    .btn-lookup {
+      padding: 0.6rem 1.2rem;
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-lookup:hover { background: var(--verde-claro); }
+
+    /* Confirmação do professor */
+    #confirmacao {
+      display: none;
+      background: #e2f4e7;
+      border: 1.5px solid #a5d6a7;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    #confirmacao strong { color: var(--verde); }
+
+    /* Disponibilidade */
+    .radio-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border: 1.5px solid var(--borda);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .radio-group input[type=radio] { accent-color: var(--verde); }
+    .radio-group label:has(input:checked) {
+      border-color: var(--verde);
+      background: #e2f4e7;
+      font-weight: 600;
+    }
+
+    /* Seção condicional */
+    #secao-cadastro { display: none; }
+
+    /* Formações */
+    .formacao-item {
+      border: 1.5px solid var(--borda);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+    .formacao-item .btn-remover {
+      position: absolute;
+      top: 0.6rem; right: 0.75rem;
+      background: none; border: none;
+      color: var(--erro); font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border: 1.5px dashed var(--verde);
+      border-radius: 8px;
+      background: none;
+      color: var(--verde);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    .btn-add:hover { background: #e2f4e7; }
+
+    /* Tags temas */
+    .tags-input { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+      border: 1.5px solid var(--borda); border-radius: 8px; padding: 0.4rem 0.6rem;
+      cursor: text; min-height: 2.5rem; }
+    .tags-input:focus-within { border-color: var(--verde-claro); box-shadow: 0 0 0 3px rgba(20,118,60,0.18); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      background: #e2f4e7; color: var(--verde);
+      border-radius: 4px; padding: 0.15rem 0.5rem;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    .tag button { background: none; border: none; color: var(--verde); cursor: pointer; font-size: 0.9rem; line-height: 1; }
+    .tag-field {
+      border: none; outline: none; background: transparent;
+      font-size: 0.9rem; color: var(--texto); min-width: 120px; flex: 1;
+    }
+
+    /* Checkbox formatos */
+    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    @media (max-width: 400px) { .checkbox-grid { grid-template-columns: 1fr; } }
+    .check-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.6rem;
+      border: 1.5px solid var(--borda); border-radius: 8px;
+      cursor: pointer; font-size: 0.875rem; font-weight: 400;
+      transition: all 0.2s;
+    }
+    .check-item:has(input:checked) { border-color: var(--verde); background: #e2f4e7; font-weight: 600; }
+    .check-item input { accent-color: var(--verde); }
+
+    /* Progresso */
+    .progress-bar { height: 4px; background: var(--borda); border-radius: 2px; margin-bottom: 1.5rem; }
+    .progress-bar .fill { height: 100%; background: var(--verde); border-radius: 2px; transition: width 0.4s; }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%; padding: 0.85rem;
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--verde-claro); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Mensagem de sucesso */
+    #msg-sucesso, #msg-recusa {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    #msg-sucesso .icon, #msg-recusa .icon { font-size: 3rem; margin-bottom: 1rem; }
+    #msg-sucesso h2 { color: var(--sucesso); }
+    #msg-recusa h2 { color: var(--muted); }
+
+    /* Erro inline */
+    .campo-erro { border-color: var(--erro) !important; }
+    .msg-erro { color: var(--erro); font-size: 0.78rem; margin-top: 0.25rem; display: none; }
+
+    /* Foto */
+    .foto-bloco { display: flex; gap: 1.1rem; align-items: flex-start; flex-wrap: wrap; }
+    .foto-caixa { width: 118px; height: 157px; border-radius: 8px; background: #e2f4e7; color: var(--verde); display: grid; place-items: center; font-weight: 800; font-size: 2rem; overflow: hidden; flex: none; border: 1.5px solid var(--borda); }
+    .foto-caixa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .foto-acoes { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; }
+    .btn-sec { padding: .5rem 1rem; border: 1.5px solid var(--borda); border-radius: 8px; background: var(--card); color: var(--texto); font-size: .875rem; font-weight: 600; cursor: pointer; }
+    .btn-sec:hover { border-color: var(--verde); color: var(--verde); }
+    .btn-sec[hidden] { display: none; }
+    .foto-nota { flex: 1; min-width: 200px; }
+    /* Autorização */
+    .autoriza { display: flex; gap: .65rem; align-items: flex-start; font-weight: 400; font-size: .92rem; cursor: pointer; padding: .75rem .9rem; border: 1.5px solid var(--borda); border-radius: 8px; }
+    .autoriza input { margin-top: .2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--verde); flex: none; }
+    .autoriza.campo-erro { border-color: var(--erro) !important; }
+    #loading { display: none; text-align: center; padding: 1rem; color: var(--muted); }
+    .spinner { display: inline-block; width: 20px; height: 20px;
+      border: 3px solid var(--borda); border-top-color: var(--verde);
+      border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Banco de fontes</h1>
+  <p>Cadastro de docente para atendimento à imprensa</p>
+  <a class="voltar" href="../">← Voltar à busca</a>
+</header>
+
+<div role="status" style="position:sticky;top:0;z-index:9999;background:#fff3cd;color:#5c4100;padding:12px;text-align:center;font:700 15px Arial,sans-serif;border-bottom:2px solid #d49b00">AMBIENTE DE TESTE — use somente dados fictícios; nenhum cadastro real deve ser enviado aqui.</div>
+<main>
+  <!-- Formulário principal -->
+  <div id="form-container">
+
+<details class="card" id="reenvio-card">
+      <summary style="cursor:pointer;font-weight:600;color:#146c39">Já se cadastrou e não recebeu o e-mail de confirmação?</summary>
+      <p class="hint">Confira a caixa de spam. Se precisar, solicite um novo link informando o mesmo SIAPE e e-mail utilizados no envio.</p>
+      <div class="field-group">
+        <label for="reenvio-siape">SIAPE</label>
+        <input type="text" id="reenvio-siape" inputmode="numeric" autocomplete="off" placeholder="Seu SIAPE">
+      </div>
+      <div class="field-group">
+        <label for="reenvio-email">E-mail institucional</label>
+        <input id="reenvio-email" type="email" autocomplete="email" placeholder="nome@unifesspa.edu.br">
+      </div>
+      <button type="button" class="btn-lookup" id="btn-reenviar" onclick="solicitarReenvio()">Reenviar confirmação</button>
+      <p id="reenvio-resultado" role="status" aria-live="polite"></p>
+    </details>
+
+    <!-- PASSO 1: SIAPE -->
+    <div class="card" id="card-siape">
+      <h2>1. Identificação pelo SIAPE</h2>
+      <div class="field-group">
+        <label for="siape">Número SIAPE <span class="req">*</span></label>
+        <div class="siape-row">
+          <input type="text" inputmode="numeric" autocomplete="off" id="siape" placeholder="Ex: 1234567" maxlength="8">
+          <button class="btn-lookup" id="btn-buscar" type="button" onclick="buscarSiape()">Buscar</button>
+        </div>
+        <p class="hint">Digite seu número SIAPE para localizar seus dados. Ele só é usado para conferir seu vínculo e não aparece no site.</p>
+        <p class="msg-erro" id="erro-siape" role="alert"></p>
+      </div>
+      <div id="confirmacao">
+        É você? <strong id="nome-confirmado"></strong> | <em id="unidade-confirmada"></em>
+        <div id="aviso-situacao"></div>
+      </div>
+    </div>
+
+    <!-- PASSO 2: Disponibilidade -->
+    <div class="card" id="card-disponivel" style="display:none">
+      <h2>2. Disponibilidade para entrevistas</h2>
+      <div class="field-group">
+        <label>Você está disponível para atender jornalistas e dar entrevistas? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="disponivel" value="sim" onchange="definirDisponibilidade(this)"> Sim, estou disponível</label>
+          <label><input type="radio" name="disponivel" value="nao" onchange="definirDisponibilidade(this)"> Não, por enquanto não</label>
+        </div>
+        <div class="field-group" id="campo-email-recusa" style="display:none;margin-top:1rem">
+          <label for="email-recusa">E-mail institucional para confirmar a resposta</label>
+          <input type="email" id="email-recusa" autocomplete="email" placeholder="nome@unifesspa.edu.br">
+          <p class="hint">Sua decisão só será registrada após confirmar o link enviado ao e-mail.</p>
+          <button type="button" class="btn-lookup" onclick="registrarRecusa()">Enviar confirmação</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSO 3: Dados do cadastro -->
+    <div id="secao-cadastro">
+
+      <div class="card">
+        <h2>3. Formação acadêmica</h2>
+        <p class="hint" style="margin-bottom:1rem">Adicione sua graduação e, se desejar, sua(s) pós-graduação(ões).</p>
+        <div id="lista-formacoes"></div>
+        <button class="btn-add" onclick="adicionarFormacao()">+ Adicionar formação</button>
+      </div>
+
+      <div class="card">
+        <h2>4. Atuação e especialidade</h2>
+
+        <div class="field-group">
+          <label>Foto de apresentação</label>
+          <div class="foto-bloco">
+            <div class="foto-caixa" id="foto-caixa" aria-live="polite"></div>
+            <div class="foto-acoes">
+              <button type="button" class="btn-sec" id="foto-alterar">Alterar foto</button>
+              <button type="button" class="btn-sec" id="foto-sigaa" hidden>Usar a foto do SIGAA</button>
+              <button type="button" class="btn-sec" id="foto-remover">Remover foto</button>
+              <input type="file" id="foto-arquivo" accept="image/*" hidden>
+            </div>
+            <p class="hint foto-nota" id="foto-nota"></p>
+          </div>
+          <p class="msg-erro" id="erro-foto" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="campus">Campus <span class="req">*</span></label>
+          <select id="campus">
+            <option value="">Selecione...</option>
+            <option>Marabá (Campus Sede)</option>
+            <option>Canaã dos Carajás</option>
+            <option>Xinguara</option>
+            <option>Rondon do Pará</option>
+            <option>São Félix do Xingu</option>
+            <option>Santana do Araguaia</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="resumo">Mini-bio / Apresentação <span class="req">*</span></label>
+          <textarea id="resumo" rows="4" placeholder="Escreva um breve resumo da sua trajetória e área de atuação (até 500 caracteres)." maxlength="500"></textarea>
+          <p class="hint"><span id="conta-resumo">0</span>/500 caracteres</p>
+        </div>
+
+        <div class="field-group">
+          <label>Temas de especialidade <span class="req">*</span></label>
+          <p class="hint" style="margin-bottom:0.5rem">Digite ou cole temas separados por vírgula, ponto e vírgula ou Enter.</p>
+          <div class="tags-input" id="tags-container" onclick="document.getElementById('tag-input').focus()">
+            <input class="tag-field" id="tag-input" placeholder="Ex: Amazônia, educação..." onkeydown="tagKeydown(event)" onblur="tagBlur()">
+          </div>
+          <input type="hidden" id="temas-value">
+        </div>
+
+        <div class="field-group">
+          <label>Formatos de atendimento</label>
+          <div class="checkbox-grid">
+            <label class="check-item"><input type="checkbox" name="formato" value="Presencial"> Presencial</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="TV ou vídeo"> TV ou vídeo</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="Rádio ou áudio"> Rádio ou áudio</label>
+            <label class="check-item"><input type="checkbox" name="formato" value="E-mail"> E-mail</label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="lattes">Link do Lattes</label>
+          <input type="url" id="lattes" placeholder="http://lattes.cnpq.br/..."><p class="hint">Use o endereço do Currículo Lattes (cnpq.br).</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>5. Contato (não público)</h2>
+        <p class="hint" style="margin-bottom:1rem">Esses dados ficam visíveis apenas para a equipe da ASCOM e não aparecem no site. Enviaremos um link de confirmação para o e-mail institucional.</p>
+        <div class="row-2">
+          <div class="field-group">
+            <label for="email">E-mail institucional <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="nome@unifesspa.edu.br" autocomplete="email">
+            <p class="msg-erro" id="erro-email">Use um e-mail @unifesspa.edu.br.</p>
+          </div>
+          <div class="field-group">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" placeholder="(94) 9 9999-9999">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>6. Observações (opcional)</h2>
+        <div class="field-group">
+          <label for="obs">Observações ou dados incorretos</label>
+          <textarea id="obs" rows="3" placeholder="Identificou algum dado errado no sistema? Deixe uma observação aqui."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>7. Autorização</h2>
+        <label class="autoriza" id="rotulo-autorizo">
+          <input type="checkbox" id="autorizo">
+          <span>Autorizo a ASCOM da Unifesspa a divulgar no Banco de fontes (página pública) meu nome, unidade, formação, temas, mini-bio, link do Lattes e foto, para consulta de jornalistas. Entendo que meu e-mail e meu WhatsApp não são públicos e que posso pedir a retirada do cadastro a qualquer momento pelo e-mail ascom@unifesspa.edu.br. <span class="req" style="color:var(--erro)">*</span></span>
+        </label>
+        <p class="msg-erro" id="erro-autorizo" role="alert">Marque a autorização para enviar o cadastro.</p>
+      </div>
+
+      <div class="isca" aria-hidden="true"><label>Não preencha <input type="text" id="site" tabindex="-1" autocomplete="off"></label></div>
+      <p class="msg-erro" id="erro-envio" role="alert" style="margin-bottom:.75rem"></p>
+      <div id="loading"><span class="spinner"></span> Enviando...</div>
+
+      <button class="btn-submit" id="btn-enviar" type="button" onclick="enviar()">Enviar cadastro</button>
+    </div><!-- /secao-cadastro -->
+
+  </div><!-- /form-container -->
+
+  <!-- Mensagem recusa -->
+  <div id="msg-recusa" class="card">
+    <div class="icon">👍</div>
+    <h2>Tudo bem!</h2>
+    <p style="margin-top:0.75rem;color:var(--muted)">Sua resposta foi registrada. Quando quiser se cadastrar, basta acessar este formulário novamente.</p>
+  </div>
+
+  <!-- Mensagem sucesso -->
+  <div id="msg-sucesso" class="card">
+    <div class="icon">✉️</div>
+    <h2>Falta só confirmar o e-mail</h2>
+    <p style="margin-top:0.75rem;color:var(--muted)">Enviamos um link de confirmação para o e-mail institucional informado. Abra a mensagem e clique no link em até 48 horas. Se não encontrar, olhe a caixa de spam.</p>
+    <p style="margin-top:0.5rem;color:var(--muted);font-size:0.875rem">Depois da confirmação, a ASCOM revisa o cadastro e o publica no Banco de fontes. Para atualizar dados, preencha o formulário de novo: o novo cadastro substitui o anterior depois de aprovado.</p>
+  </div>
+
+</main>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1gS7YD27skORPolGQaFkKKpC7fHAJLir8mBE5UpnPaCVHb5fmKJ9GpnebpRkE9Yb9/exec';
+const DOMINIO_EMAIL = '@unifesspa.edu.br';
+
+// ─── Estado ────────────────────────────────────────────────────────────────
+let docenteAtual = null;
+let tags = [];
+let formacaoCount = 0;
+// Foto: 'sigaa' (padrão, se houver), 'enviada' (do aparelho) ou 'nenhuma' (só iniciais)
+const foto = { modo: 'nenhuma', sigaa: '', dados: '' };
+const $ = id => document.getElementById(id);
+
+function chamar(dados) {
+  return fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(dados)
+  }).then(r => r.json());
+}
+
+function solicitarReenvio() {
+  const siape = $('reenvio-siape').value.replace(/\D/g, '');
+  const email = $('reenvio-email').value.trim().toLowerCase();
+  const resultado = $('reenvio-resultado');
+  if (siape.length < 6 || siape.length > 8 || !emailValido(email)) {
+    resultado.textContent = 'Informe um SIAPE e e-mail institucional válidos.';
+    return;
+  }
+  const btn = $('btn-reenviar');
+  btn.disabled = true;
+  resultado.textContent = 'Solicitando novo link...';
+  chamar({ acao: 'reenviar', siape, email })
+    .then(r => { resultado.textContent = r.msg || (r.status === 'ok' ? 'Solicitação recebida.' : 'Não foi possível enviar agora.'); })
+    .catch(() => { resultado.textContent = 'Falha de conexão. Tente novamente.'; })
+    .finally(() => { btn.disabled = false; });
+}
+
+// ─── Busca SIAPE (conferida no servidor) ───────────────────────────────────
+function buscarSiape() {
+  const siape = $('siape').value.replace(/\D/g, '');
+  const erro = $('erro-siape');
+  erro.style.display = 'none';
+  $('confirmacao').style.display = 'none';
+  $('card-disponivel').style.display = 'none';
+  docenteAtual = null;
+
+  if (siape.length < 6 || siape.length > 8) {
+    erro.textContent = 'Digite um SIAPE válido (de 6 a 8 dígitos).';
+    erro.style.display = 'block';
+    return;
+  }
+  const btn = $('btn-buscar');
+  btn.disabled = true; btn.textContent = 'Buscando...';
+  chamar({ acao: 'verificar', siape })
+    .then(r => {
+      if (r.status !== 'ok') {
+        erro.textContent = r.msg || 'Não foi possível verificar o SIAPE.';
+        erro.style.display = 'block';
+        return;
+      }
+      docenteAtual = { siape, nome: r.nome, unidade: r.unidade, situacao: r.situacao };
+      foto.sigaa = urlFotoValida(r.foto); foto.dados = '';
+      foto.modo = foto.sigaa ? 'sigaa' : 'nenhuma';
+      desenharFoto();
+      $('nome-confirmado').textContent = r.nome;
+      $('unidade-confirmada').textContent = r.unidade;
+      const aviso = $('aviso-situacao');
+      const textos = {
+        cadastrado: 'Você já tem um cadastro publicado. Um novo envio substituirá o atual depois de aprovado pela ASCOM.',
+        pendente: 'Há um cadastro seu em andamento. Um novo envio será analisado como atualização.',
+        recusou: 'Você tinha informado que não quer participar. Pode mudar de ideia aqui.'
+      };
+      aviso.textContent = textos[r.situacao] || '';
+      aviso.style.display = textos[r.situacao] ? 'block' : 'none';
+      $('confirmacao').style.display = 'block';
+      $('card-disponivel').style.display = 'block';
+      setTimeout(() => $('card-disponivel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    })
+    .catch(() => {
+      erro.textContent = 'Falha de conexão. Tente novamente.';
+      erro.style.display = 'block';
+    })
+    .finally(() => { btn.disabled = false; btn.textContent = 'Buscar'; });
+}
+$('siape').addEventListener('keydown', e => { if (e.key === 'Enter') buscarSiape(); });
+
+// ─── Foto (3:4, 354x472) ───────────────────────────────────────────────────
+const FOTO_L = 354, FOTO_A = 472, FOTO_MAX_BYTES = 150000;
+function urlFotoValida(u) {
+  const s = String(u || '').trim();
+  return /^https:\/\/sigaa\.unifesspa\.edu\.br\/sigaa\/verFoto\?[A-Za-z0-9=&%_.\-]+$/.test(s) ? s : '';
+}
+function iniciaisDe(nome) {
+  const p = String(nome || '').replace(/\b(d[aeo]s?|e)\b/gi, ' ').split(/\s+/).filter(Boolean);
+  if (!p.length) return '?';
+  return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+}
+function desenharFoto() {
+  const caixa = $('foto-caixa');
+  caixa.textContent = '';
+  const ini = iniciaisDe(docenteAtual && docenteAtual.nome);
+  let fonte = '';
+  if (foto.modo === 'enviada') fonte = foto.dados;
+  else if (foto.modo === 'sigaa') fonte = foto.sigaa;
+  caixa.textContent = ini;
+  if (fonte) {
+    const im = document.createElement('img');
+    im.alt = 'Sua foto'; im.referrerPolicy = 'no-referrer';
+    im.addEventListener('load', () => { caixa.textContent = ''; caixa.appendChild(im); });
+    im.addEventListener('error', () => {
+      // A foto do SIGAA não abriu: o cadastro segue sem foto, sem travar nada.
+      if (foto.modo === 'sigaa') { foto.modo = 'nenhuma'; desenharFoto(); $('erro-foto').textContent = 'Não foi possível carregar a foto do SIGAA. Você pode enviar outra pelo botão "Alterar foto" ou seguir só com as iniciais.'; $('erro-foto').style.display = 'block'; }
+    });
+    im.src = fonte;
+  }
+  const temFoto = foto.modo !== 'nenhuma';
+  $('foto-remover').hidden = !temFoto;
+  $('foto-alterar').textContent = temFoto ? 'Alterar foto' : 'Enviar uma foto';
+  $('foto-sigaa').hidden = !(foto.sigaa && foto.modo !== 'sigaa');
+  const notas = {
+    sigaa: 'Esta é a foto do seu cadastro no SIGAA. Ela aparece no banco de fontes, a menos que você troque ou remova.',
+    enviada: 'Foto enviada por você, recortada no formato 3x4. Ela só vai para o site depois que a ASCOM aprovar o cadastro.',
+    nenhuma: 'Sem foto, o cartão mostra apenas as suas iniciais.'
+  };
+  $('foto-nota').textContent = notas[foto.modo];
+}
+function lerImagem(arquivo) {
+  if (window.createImageBitmap) return createImageBitmap(arquivo);
+  return new Promise((ok, falha) => {
+    const u = URL.createObjectURL(arquivo), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(u); ok(im); };
+    im.onerror = () => { URL.revokeObjectURL(u); falha(new Error('imagem')); };
+    im.src = u;
+  });
+}
+// Recorta ao centro em 3:4 e gera JPEG de até ~150 KB
+function prepararFoto(arquivo) {
+  return lerImagem(arquivo).then(img => {
+    const w = img.width, h = img.height;
+    if (!w || !h) throw new Error('imagem');
+    const alvo = FOTO_L / FOTO_A;
+    let sw = w, sh = h;
+    if (w / h > alvo) sw = Math.round(h * alvo); else sh = Math.round(w / alvo);
+    const sx = Math.round((w - sw) / 2), sy = Math.round((h - sh) / 2);
+    for (const escala of [1, 0.75, 0.5]) {
+      const cw = Math.round(FOTO_L * escala), ch = Math.round(FOTO_A * escala);
+      const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, cw, ch);
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+      for (const q of [0.88, 0.8, 0.7, 0.6, 0.5]) {
+        const url = c.toDataURL('image/jpeg', q);
+        if (Math.floor((url.length - 23) * 3 / 4) <= FOTO_MAX_BYTES) return url;
+      }
+    }
+    throw new Error('grande');
+  });
+}
+$('foto-alterar').addEventListener('click', () => $('foto-arquivo').click());
+$('foto-arquivo').addEventListener('change', function () {
+  const arq = this.files && this.files[0];
+  this.value = '';
+  const erro = $('erro-foto'); erro.style.display = 'none';
+  if (!arq) return;
+  if (!/^image\//.test(arq.type)) { erro.textContent = 'Escolha um arquivo de imagem (JPG, PNG ou similar).'; erro.style.display = 'block'; return; }
+  if (arq.size > 15 * 1024 * 1024) { erro.textContent = 'A imagem é muito grande. Escolha uma de até 15 MB.'; erro.style.display = 'block'; return; }
+  prepararFoto(arq).then(url => { foto.dados = url; foto.modo = 'enviada'; desenharFoto(); })
+    .catch(() => { erro.textContent = 'Não foi possível usar essa imagem. Tente outro arquivo (JPG ou PNG).'; erro.style.display = 'block'; });
+});
+$('foto-remover').addEventListener('click', () => { foto.modo = 'nenhuma'; foto.dados = ''; $('erro-foto').style.display = 'none'; desenharFoto(); });
+$('foto-sigaa').addEventListener('click', () => { if (foto.sigaa) { foto.modo = 'sigaa'; foto.dados = ''; $('erro-foto').style.display = 'none'; desenharFoto(); } });
+desenharFoto();
+
+// ─── Disponibilidade ───────────────────────────────────────────────────────
+function definirDisponibilidade(radio) {
+  const secao = $('secao-cadastro');
+  if (radio.value === 'sim') {
+    $('campo-email-recusa').style.display = 'none';
+    secao.style.display = 'block';
+    $('msg-recusa').style.display = 'none';
+    if (formacaoCount === 0) adicionarFormacao('Graduação');
+    setTimeout(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  } else {
+    secao.style.display = 'none';
+    $('campo-email-recusa').style.display = 'block';
+    $('campo-email-recusa').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function registrarRecusa() {
+  if (!docenteAtual) return;
+  const email = $('email-recusa').value.trim().toLowerCase();
+  if (!emailValido(email)) { alert('Informe um e-mail institucional válido.'); return; }
+  chamar({ acao: 'recusa', siape: docenteAtual.siape, email: email, site: $('site').value })
+    .then(r => {
+      if (r.status !== 'ok') {
+        alert(r.msg || 'Não foi possível registrar a resposta.');
+        document.querySelectorAll('input[name=disponivel]').forEach(i => { i.checked = false; });
+        return;
+      }
+      $('form-container').style.display = 'none';
+      $('msg-recusa').style.display = 'block';
+      $('msg-recusa').textContent = 'Enviamos um link para seu e-mail institucional. Confirme a mensagem em até 48 horas para registrar sua decisão.';
+    })
+    .catch(() => {
+      alert('Falha de conexão. Tente novamente.');
+      document.querySelectorAll('input[name=disponivel]').forEach(i => { i.checked = false; });
+    });
+}
+
+// ─── Formações ─────────────────────────────────────────────────────────────
+function adicionarFormacao(nivelDefault) {
+  formacaoCount++;
+  const id = formacaoCount;
+  const div = document.createElement('div');
+  div.className = 'formacao-item';
+  div.id = `formacao-${id}`;
+  const niveis = ['Graduação', 'Especialização', 'Mestrado', 'Doutorado', 'Pós-Doutorado']
+    .map(n => `<option value="${n}" ${nivelDefault === n ? 'selected' : ''}>${n}</option>`).join('');
+  div.innerHTML = `
+    <button class="btn-remover" type="button" onclick="removerFormacao(${id})" title="Remover">✕</button>
+    <div class="row-2" style="margin-bottom:0.75rem">
+      <div class="field-group" style="margin-bottom:0">
+        <label>Nível</label>
+        <select id="nivel-${id}">${niveis}</select>
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label>Ano de conclusão</label>
+        <input type="number" id="ano-${id}" placeholder="Ex: 2010" min="1960" max="2030">
+      </div>
+    </div>
+    <div class="field-group" style="margin-bottom:0.75rem">
+      <label>Curso / Título <span class="req">*</span></label>
+      <input type="text" id="curso-${id}" placeholder="Ex: Ciências Biológicas" maxlength="120">
+    </div>
+    <div class="field-group" style="margin-bottom:0">
+      <label>Instituição <span class="req">*</span></label>
+      <input type="text" id="inst-${id}" placeholder="Ex: UFPA" maxlength="120">
+    </div>
+  `;
+  $('lista-formacoes').appendChild(div);
+}
+function removerFormacao(id) { const el = $(`formacao-${id}`); if (el) el.remove(); }
+
+function coletarFormacoes() {
+  return Array.from(document.querySelectorAll('.formacao-item')).map(item => {
+    const id = item.id.replace('formacao-', '');
+    return {
+      nivel: $(`nivel-${id}`).value,
+      curso: $(`curso-${id}`).value.trim(),
+      instituicao: $(`inst-${id}`).value.trim(),
+      ano: $(`ano-${id}`).value
+    };
+  }).filter(f => f.curso && f.instituicao);
+}
+
+// ─── Tags ──────────────────────────────────────────────────────────────────
+function tagKeydown(e) {
+  if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+    e.preventDefault();
+    adicionarTag(e.target.value);
+  } else if (e.key === 'Backspace' && e.target.value === '' && tags.length) {
+    removerTag(tags.length - 1);
+  }
+}
+function tagBlur() {
+  const input = $('tag-input');
+  if (input.value.trim()) adicionarTag(input.value);
+}
+function adicionarTag(texto) {
+  $('tag-input').value = '';
+  String(texto).split(/[,;\n\r]+/).forEach(parte => {
+    const t = parte.trim().replace(/\s+/g, ' ').slice(0, 60);
+    if (!t || tags.some(x => x.toLowerCase() === t.toLowerCase()) || tags.length >= 12) return;
+    tags.push(t);
+  });
+  renderTags();
+  $('tags-container').style.borderColor = '';
+}
+$('tag-input').addEventListener('input', function () {
+  if (/[,;\n\r]/.test(this.value)) adicionarTag(this.value);
+});
+$('tag-input').addEventListener('paste', function (e) {
+  const t = e.clipboardData && e.clipboardData.getData('text');
+  if (t && /[,;\n\r]/.test(t)) { e.preventDefault(); adicionarTag(this.value + ' ' + t); }
+});
+function removerTag(i) { tags.splice(i, 1); renderTags(); }
+function renderTags() {
+  const container = $('tags-container');
+  const input = $('tag-input');
+  container.querySelectorAll('.tag').forEach(t => t.remove());
+  tags.forEach((t, i) => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.appendChild(document.createTextNode(t + ' '));
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = '×'; b.setAttribute('aria-label', 'Remover ' + t);
+    b.addEventListener('click', () => removerTag(i));
+    span.appendChild(b);
+    container.insertBefore(span, input);
+  });
+}
+
+// ─── Contador resumo ───────────────────────────────────────────────────────
+$('resumo').addEventListener('input', function () { $('conta-resumo').textContent = this.value.length; });
+
+// ─── Envio ─────────────────────────────────────────────────────────────────
+function emailValido(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.toLowerCase().endsWith(DOMINIO_EMAIL);
+}
+
+function enviar() {
+  if (!docenteAtual || !validar()) return;
+  const formatos = Array.from(document.querySelectorAll('input[name=formato]:checked')).map(c => c.value);
+  const dados = {
+    acao: 'cadastro',
+    siape: docenteAtual.siape,
+    campus: $('campus').value,
+    resumo: $('resumo').value.trim(),
+    temas: tags,
+    formatos,
+    lattes: $('lattes').value.trim(),
+    email: $('email').value.trim(),
+    whatsapp: $('whatsapp').value.trim(),
+    observacao: $('obs').value.trim(),
+    formacoes: coletarFormacoes(),
+    autorizo: true,
+    foto_modo: foto.modo,
+    site: $('site').value
+  };
+  if (foto.modo === 'enviada') dados.foto_dados = foto.dados;
+  $('erro-envio').style.display = 'none';
+  $('loading').style.display = 'block';
+  $('btn-enviar').disabled = true;
+
+  chamar(dados)
+    .then(resp => {
+      if (resp.status === 'ok') {
+        $('form-container').style.display = 'none';
+        $('msg-sucesso').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        $('erro-envio').textContent = resp.msg || 'Não foi possível enviar. Tente novamente.';
+        $('erro-envio').style.display = 'block';
+        $('loading').style.display = 'none';
+        $('btn-enviar').disabled = false;
+      }
+    })
+    .catch(() => {
+      $('erro-envio').textContent = 'Falha de conexão. Verifique a internet e tente novamente.';
+      $('erro-envio').style.display = 'block';
+      $('loading').style.display = 'none';
+      $('btn-enviar').disabled = false;
+    });
+}
+
+function validar() {
+  let ok = true;
+  let primeiro = null;
+  function marcar(id) {
+    const el = $(id);
+    el.classList.add('campo-erro');
+    el.addEventListener('input', () => el.classList.remove('campo-erro'), { once: true });
+    ok = false;
+    if (!primeiro) primeiro = el;
+  }
+  if (!$('campus').value) marcar('campus');
+  if ($('resumo').value.trim().length < 20) marcar('resumo');
+  const em = $('email').value.trim();
+  $('erro-email').style.display = 'none';
+  if (!emailValido(em)) { marcar('email'); $('erro-email').style.display = 'block'; }
+  if (tags.length === 0) { $('tags-container').style.borderColor = 'var(--erro)'; ok = false; if (!primeiro) primeiro = $('tags-container'); }
+  $('erro-autorizo').style.display = 'none';
+  if (!$('autorizo').checked) {
+    $('erro-autorizo').style.display = 'block';
+    $('rotulo-autorizo').classList.add('campo-erro');
+    $('autorizo').addEventListener('change', () => $('rotulo-autorizo').classList.remove('campo-erro'), { once: true });
+    ok = false; if (!primeiro) primeiro = $('rotulo-autorizo');
+  }
+  if (coletarFormacoes().length === 0) {
+    const e = $('erro-envio');
+    e.textContent = 'Adicione pelo menos uma formação, com curso e instituição.';
+    e.style.display = 'block';
+    ok = false;
+  }
+  if (primeiro) primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return ok;
+}
+</script>
+</body>
+</html>
